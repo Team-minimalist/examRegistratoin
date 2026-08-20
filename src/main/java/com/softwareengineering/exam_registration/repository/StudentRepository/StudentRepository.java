@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.softwareengineering.exam_registration.model.Student;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface StudentRepository extends MongoRepository<Student,String> {
-
+public interface StudentRepository extends MongoRepository<Student, String> {
+    Optional<Student> findByStudentEmail(String studentEmail);
+    boolean existsByEmail(String email);
 }
