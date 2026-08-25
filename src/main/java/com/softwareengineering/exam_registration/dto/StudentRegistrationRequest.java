@@ -1,5 +1,6 @@
 package com.softwareengineering.exam_registration.dto;
 
+import com.softwareengineering.exam_registration.model.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,8 +10,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StudentRegistrationRequest {
 
-    private String name;
-    private String email;
-    private String phone;
-    private String password;
+    private PersonalInfo personalInfo;
+
+    private Education education;
+
+    private Identification identification;
+
+    private ContactInfo contact;
+
+    private Address address;
 }
