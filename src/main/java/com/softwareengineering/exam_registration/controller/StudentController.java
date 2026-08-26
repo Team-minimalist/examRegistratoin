@@ -3,6 +3,8 @@ package com.softwareengineering.exam_registration.controller;
 import com.softwareengineering.exam_registration.dto.StudentRegistrationRequest;
 import com.softwareengineering.exam_registration.service.StudentService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +20,7 @@ public class StudentController {
 
     @PostMapping("/register")
     public StudentRegistrationRequest registerStudent(
-            @RequestBody StudentRegistrationRequest request) {
+           @Valid  @RequestBody StudentRegistrationRequest request) {
 
         return request;
     }
