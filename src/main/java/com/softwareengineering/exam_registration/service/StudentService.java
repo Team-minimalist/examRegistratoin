@@ -1,6 +1,8 @@
 package com.softwareengineering.exam_registration.service;
 
 import com.softwareengineering.exam_registration.dto.StudentRegistrationRequest;
+import com.softwareengineering.exam_registration.exception.DuplicateEmailException;
+import com.softwareengineering.exam_registration.exception.DuplicateIdentificationException;
 import com.softwareengineering.exam_registration.model.Student;
 import com.softwareengineering.exam_registration.repository.CounterRepository;
 import com.softwareengineering.exam_registration.repository.StudentRepository;
@@ -24,6 +26,25 @@ public class StudentService {
 
     public Student registerStudent(StudentRegistrationRequest request) {
 
+        String email = request.getContact().getEmail();
+        String identificationNumber =
+                request.getIdentification().getNumber();
+
+        // Check duplicate email
+        if (studentRepository.existsByContact_Email(email)) {
+            throw new DuplicateEmailException(
+                    "A student with this email already exists"
+            );
+        }
+
+        // Check duplicate identification
+        if (studentRepository.existsByIdentification_Number(identificationNumber)) {
+
+            throw new DuplicateIdentificationException(
+                    "A student with this identification number already exists"
+            );
+        }
+
         Student student = new Student();
 
         student.setPersonalInfo(request.getPersonalInfo());
@@ -32,7 +53,9 @@ public class StudentService {
         student.setContact(request.getContact());
         student.setAddress(request.getAddress());
 
-        long sequence = counterRepository.getNextSequence("student");
+        // Generate unique student ID
+        long sequence =
+                counterRepository.getNextSequence("student");
 
         String studentId = String.format(
                 "STU2026%06d",
@@ -40,7 +63,6 @@ public class StudentService {
         );
 
         student.setStudentId(studentId);
-
         student.setCreatedAt(LocalDateTime.now());
 
         return studentRepository.save(student);
