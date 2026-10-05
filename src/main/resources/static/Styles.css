@@ -1,0 +1,401 @@
+/* ==============================
+   Global Styles
+   ============================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+
+/* ==============================
+   Page
+   ============================== */
+
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ==============================
+   Header
+   ============================== */
+
+.header {
+    width: 100%;
+    padding: 18px 6%;
+    background: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.logo h1 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.logo p {
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.login-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+
+/* ==============================
+   Main Container
+   ============================== */
+
+.container {
+    width: min(1000px, 92%);
+    margin: 40px auto;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    padding: 35px;
+
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+
+/* ==============================
+   Form Header
+   ============================== */
+
+.form-header {
+    margin-bottom: 30px;
+}
+
+.form-header h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.form-header p {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* ==============================
+   Form Section
+   ============================== */
+
+.form-section {
+    padding: 25px 0;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+.form-section h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+
+    color: #111827;
+}
+
+
+/* ==============================
+   Form Grid
+   ============================== */
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ==============================
+   Labels
+   ============================== */
+
+.form-group label {
+    margin-bottom: 7px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #374151;
+}
+
+.form-group label span {
+    color: #dc2626;
+}
+
+
+/* ==============================
+   Inputs
+   ============================== */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+
+    width: 100%;
+
+    padding: 12px 13px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+
+/* Focus */
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+
+    border-color: #2563eb;
+
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+
+/* Placeholder */
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #9ca3af;
+}
+
+
+/* ==============================
+   Terms
+   ============================== */
+
+.terms {
+    padding: 20px 0;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 10px;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    color: #4b5563;
+
+    cursor: pointer;
+}
+
+.checkbox-container input {
+    margin-top: 3px;
+
+    width: 16px;
+    height: 16px;
+
+    cursor: pointer;
+}
+
+
+/* ==============================
+   Buttons
+   ============================== */
+
+.form-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    padding-top: 10px;
+}
+
+.btn {
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+/* Secondary */
+
+.btn-secondary {
+
+    background: #ffffff;
+
+    border: 1px solid #d1d5db;
+
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #f9fafb;
+}
+
+
+/* Primary */
+
+.btn-primary {
+
+    background: #2563eb;
+
+    border: 1px solid #2563eb;
+
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+
+    border-color: #1d4ed8;
+}
+
+
+/* ==============================
+   Footer
+   ============================== */
+
+.footer {
+
+    margin-top: auto;
+
+    text-align: center;
+
+    padding: 20px;
+
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+
+/* ==============================
+   Responsive Design
+   ============================== */
+
+@media (max-width: 700px) {
+
+    .header {
+        padding: 15px 4%;
+    }
+
+    .logo h1 {
+        font-size: 17px;
+    }
+
+    .login-link {
+        font-size: 12px;
+    }
+
+    .container {
+        width: 94%;
+        padding: 22px;
+        margin: 25px auto;
+    }
+
+    .form-header h2 {
+        font-size: 23px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: auto;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
