@@ -4,10 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * AdminAddress
+ */
+
 @Getter 
 @Setter 
-public class UserAddress {
-
+public class AdminAddress {
     @NotBlank
     private String pincode;
     @NotBlank

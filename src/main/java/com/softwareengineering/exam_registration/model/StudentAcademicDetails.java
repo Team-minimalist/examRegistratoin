@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AcademicDetails {
+public class StudentAcademicDetails {
 
     @NotBlank(message = "Institution type is required")
     private String institutionType;
