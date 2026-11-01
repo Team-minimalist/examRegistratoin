@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create / Edit Examination - Admin</title>
+    <link rel="stylesheet" href="/css/Styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <nav class="navbar admin-nav">
+        <a href="/admin/dashboard.html" class="nav-brand">
+            <div class="brand-badge">ADM</div>
+            <div class="brand-text">
+                <h1 style="color: #fff;">Admin Portal</h1>
+                <p style="color: #94a3b8;">Exam Registration System</p>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/admin/dashboard.html">Overview</a></li>
+            <li><a href="/admin/exams.html" class="active">Manage Exams</a></li>
+            <li><a href="/admin/students.html">Students</a></li>
+            <li><a href="/admin/registrations.html">Registrations</a></li>
+            <li><a href="/logout" class="btn btn-secondary btn-sm">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 1.5rem;">
+            <h2 id="form-title">Create Examination</h2>
+            <p style="color: var(--gray); font-size: 0.95rem;">Set up examination parameters, eligibility periods, and schedules.</p>
+        </div>
+
+        <div id="admin-exam-alert" class="alert" style="display: none;"></div>
+
+        <form id="create-exam-form" class="card">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="examName">Examination Title <span>*</span></label>
+                    <input type="text" id="examName" placeholder="e.g. National Engineering Entrance Exam 2026" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description">Detailed Description</label>
+                    <textarea id="description" rows="3" placeholder="Provide syllabus overview, eligibility criteria, and exam guidelines..."></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="conductingOrganization">Conducting Body / Organization <span>*</span></label>
+                    <input type="text" id="conductingOrganization" placeholder="e.g. Central Board of Examinations" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registrationStartDate">Registration Start Date <span>*</span></label>
+                    <input type="date" id="registrationStartDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registrationEndDate">Registration End Date <span>*</span></label>
+                    <input type="date" id="registrationEndDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="examDate">Examination Date <span>*</span></label>
+                    <input type="date" id="examDate" required>
+                </div>
+
+                <div class="form-group" style="justify-content: center;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 1rem;">
+                        <input type="checkbox" id="active" checked style="width: 18px; height: 18px;">
+                        <span>Active (Visible on Portal)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                <a href="/admin/exams.html" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">Save Examination</button>
+            </div>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Student Examination Registration System — Administrator Console</p>
+    </footer>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>
+

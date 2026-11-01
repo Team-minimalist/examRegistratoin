@@ -1,91 +1,224 @@
 package com.softwareengineering.exam_registration.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.softwareengineering.exam_registration.dto.AdminRegistrationRequest;
-import com.softwareengineering.exam_registration.model.Admin;
-import com.softwareengineering.exam_registration.service.AdminService;
+import com.softwareengineering.exam_registration.dto.ApiResponse;
+import com.softwareengineering.exam_registration.dto.ExamRegistrationResponse;
+import com.softwareengineering.exam_registration.dto.ExamRequest;
+import com.softwareengineering.exam_registration.dto.ExamResponse;
+import com.softwareengineering.exam_registration.dto.StudentResponse;
+import com.softwareengineering.exam_registration.model.Role;
+import com.softwareengineering.exam_registration.repository.ExamRegistrationRepository;
+import com.softwareengineering.exam_registration.repository.ExamRepository;
+import com.softwareengineering.exam_registration.repository.UserRepository;
+import com.softwareengineering.exam_registration.service.ExamRegistrationService;
+import com.softwareengineering.exam_registration.service.ExamService;
+import com.softwareengineering.exam_registration.service.StudentService;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/admins")
+@RequestMapping("/api/admin")
 public class AdminController {
 
-    private final AdminService adminService;
+    private final ExamService examService;
+    private final StudentService studentService;
+    private final ExamRegistrationService examRegistrationService;
+    private final UserRepository userRepository;
+    private final ExamRepository examRepository;
+    private final ExamRegistrationRepository examRegistrationRepository;
 
-    public AdminController(AdminService adminService) {
-        this.adminService = adminService;
+    public AdminController(ExamService examService,
+                           StudentService studentService,
+                           ExamRegistrationService examRegistrationService,
+                           UserRepository userRepository,
+                           ExamRepository examRepository,
+                           ExamRegistrationRepository examRegistrationRepository) {
+        this.examService = examService;
+        this.studentService = studentService;
+        this.examRegistrationService = examRegistrationService;
+        this.userRepository = userRepository;
+        this.examRepository = examRepository;
+        this.examRegistrationRepository = examRegistrationRepository;
     }
 
-    // CREATE ADMIN
-    @PostMapping
-    public ResponseEntity<Admin> createAdmin(
-            @Valid @RequestBody AdminRegistrationRequest request) {
+    @GetMapping("/stats")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getAdminStats() {
+        Map<String, Object> stats = new HashMap<>();
 
-        Admin admin = new Admin();
+        long totalStudents = userRepository.countByRole(Role.STUDENT);
+        long activeStudents = userRepository.findByRole(Role.STUDENT).stream().filter(u -> u.isActive()).count();
+        long totalExams = examRepository.count();
+        long activeExams = examRepository.countByActiveTrue();
+        List<ExamResponse> allExams = examService.getAllExamsForAdmin();
+        long openExams = allExams.stream().filter(e -> "OPEN".equalsIgnoreCase(e.getRegistrationStatus())).count();
+        long totalRegistrations = examRegistrationRepository.count();
 
-        admin.setAdminFirstName(request.getAdminFirstName());
-        admin.setAdminLastName(request.getAdminLastName());
-        admin.setAdminEmail(request.getAdminEmail());
-        admin.setAdminPhoneNo(request.getAdminPhoneNo());
-        admin.setAdminRole(request.getAdminRole());
-        admin.setAdminAddress(request.getAdminAddress());
+        stats.put("totalStudents", totalStudents);
+        stats.put("activeStudents", activeStudents);
+        stats.put("totalExams", totalExams);
+        stats.put("activeExams", activeExams);
+        stats.put("openExams", openExams);
+        stats.put("totalRegistrations", totalRegistrations);
 
         return ResponseEntity.ok(
-                adminService.createAdmin(admin)
+                ApiResponse.<Map<String, Object>>builder()
+                        .success(true)
+                        .message("Admin statistics retrieved")
+                        .data(stats)
+                        .path("/api/admin/stats")
+                        .build()
         );
     }
 
-    // GET ALL ADMINS
-    @GetMapping
-    public ResponseEntity<List<Admin>> getAllAdmins() {
-
+    // EXAM MANAGEMENT
+    @GetMapping("/exams")
+    public ResponseEntity<ApiResponse<List<ExamResponse>>> getAllExams() {
+        List<ExamResponse> exams = examService.getAllExamsForAdmin();
         return ResponseEntity.ok(
-                adminService.getAllAdmin()
+                ApiResponse.<List<ExamResponse>>builder()
+                        .success(true)
+                        .message("All examinations retrieved")
+                        .data(exams)
+                        .path("/api/admin/exams")
+                        .build()
         );
     }
 
-    // GET ADMIN BY ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Admin> getAdminById(
-            @PathVariable String id) {
+    @PostMapping("/exams")
+    public ResponseEntity<ApiResponse<ExamResponse>> createExam(
+            @Valid @RequestBody ExamRequest request) {
 
-        return ResponseEntity.ok(
-                adminService.getByAdminId(id)
+        ExamResponse created = examService.createExam(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.<ExamResponse>builder()
+                        .success(true)
+                        .message("Examination created successfully")
+                        .data(created)
+                        .path("/api/admin/exams")
+                        .build()
         );
     }
 
-    // UPDATE ADMIN
-    @PutMapping("/{id}")
-    public ResponseEntity<Admin> updateAdmin(
+    @PutMapping("/exams/{id}")
+    public ResponseEntity<ApiResponse<ExamResponse>> updateExam(
             @PathVariable String id,
-            @Valid @RequestBody AdminRegistrationRequest request) {
+            @Valid @RequestBody ExamRequest request) {
 
-        Admin admin = new Admin();
-
-        admin.setAdminFirstName(request.getAdminFirstName());
-        admin.setAdminLastName(request.getAdminLastName());
-        admin.setAdminEmail(request.getAdminEmail());
-        admin.setAdminPhoneNo(request.getAdminPhoneNo());
-        admin.setAdminRole(request.getAdminRole());
-        admin.setAdminAddress(request.getAdminAddress());
-
+        ExamResponse updated = examService.updateExam(id, request);
         return ResponseEntity.ok(
-                adminService.updateAdmin(id, admin)
+                ApiResponse.<ExamResponse>builder()
+                        .success(true)
+                        .message("Examination updated successfully")
+                        .data(updated)
+                        .path("/api/admin/exams/" + id)
+                        .build()
         );
     }
 
-    // DELETE ADMIN
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAdmin(
-            @PathVariable String id) {
+    @PatchMapping("/exams/{id}/status")
+    public ResponseEntity<ApiResponse<ExamResponse>> toggleExamStatus(@PathVariable String id) {
+        ExamResponse updated = examService.toggleExamStatus(id);
+        return ResponseEntity.ok(
+                ApiResponse.<ExamResponse>builder()
+                        .success(true)
+                        .message("Examination status toggled successfully")
+                        .data(updated)
+                        .path("/api/admin/exams/" + id + "/status")
+                        .build()
+        );
+    }
 
-        adminService.deleteAdmin(id);
+    @DeleteMapping("/exams/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteExam(@PathVariable String id) {
+        examService.deleteExam(id);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .message("Examination deleted successfully")
+                        .path("/api/admin/exams/" + id)
+                        .build()
+        );
+    }
 
-        return ResponseEntity.noContent().build();
+    // STUDENT MANAGEMENT
+    @GetMapping("/students")
+    public ResponseEntity<ApiResponse<List<StudentResponse>>> getAllStudents() {
+        List<StudentResponse> students = studentService.getAllStudents();
+        return ResponseEntity.ok(
+                ApiResponse.<List<StudentResponse>>builder()
+                        .success(true)
+                        .message("Students list retrieved")
+                        .data(students)
+                        .path("/api/admin/students")
+                        .build()
+        );
+    }
+
+    @GetMapping("/students/{id}")
+    public ResponseEntity<ApiResponse<StudentResponse>> getStudentById(@PathVariable String id) {
+        StudentResponse student = studentService.getStudentById(id);
+        return ResponseEntity.ok(
+                ApiResponse.<StudentResponse>builder()
+                        .success(true)
+                        .message("Student retrieved")
+                        .data(student)
+                        .path("/api/admin/students/" + id)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/students/{id}/status")
+    public ResponseEntity<ApiResponse<StudentResponse>> toggleStudentStatus(@PathVariable String id) {
+        StudentResponse updated = studentService.toggleStudentActiveStatus(id);
+        return ResponseEntity.ok(
+                ApiResponse.<StudentResponse>builder()
+                        .success(true)
+                        .message("Student status updated")
+                        .data(updated)
+                        .path("/api/admin/students/" + id + "/status")
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/students/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteStudent(@PathVariable String id) {
+        studentService.deleteStudent(id);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .message("Student deleted successfully")
+                        .path("/api/admin/students/" + id)
+                        .build()
+        );
+    }
+
+    // REGISTRATION MANAGEMENT
+    @GetMapping("/registrations")
+    public ResponseEntity<ApiResponse<List<ExamRegistrationResponse>>> getAllRegistrations() {
+        List<ExamRegistrationResponse> registrations = examRegistrationService.getAllRegistrationsForAdmin();
+        return ResponseEntity.ok(
+                ApiResponse.<List<ExamRegistrationResponse>>builder()
+                        .success(true)
+                        .message("All examination registrations retrieved")
+                        .data(registrations)
+                        .path("/api/admin/registrations")
+                        .build()
+        );
     }
 }

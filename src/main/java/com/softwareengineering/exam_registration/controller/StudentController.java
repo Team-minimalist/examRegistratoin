@@ -1,21 +1,20 @@
 package com.softwareengineering.exam_registration.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.softwareengineering.exam_registration.dto.StudentRegistrationRequest;
-import com.softwareengineering.exam_registration.model.Student;
+import com.softwareengineering.exam_registration.dto.ApiResponse;
+import com.softwareengineering.exam_registration.dto.StudentProfileUpdateRequest;
+import com.softwareengineering.exam_registration.dto.StudentResponse;
 import com.softwareengineering.exam_registration.service.StudentService;
 
 import jakarta.validation.Valid;
-
 
 @RestController
 @RequestMapping("/api/students")
@@ -27,34 +26,46 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    // Get all students
-    @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents() {
-        return ResponseEntity.ok(studentService.getAllStudents());
+    private String resolveUsernameOrEmail(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof OAuth2User oauth2User) {
+            String email = oauth2User.getAttribute("email");
+            if (email != null) {
+                return email;
+            }
+        }
+        return authentication.getName();
     }
 
-    // Get student by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Student> getStudentById(
-            @PathVariable String id) {
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<StudentResponse>> getMyProfile(Authentication authentication) {
+        String usernameOrEmail = resolveUsernameOrEmail(authentication);
+        StudentResponse response = studentService.getStudentProfile(usernameOrEmail);
 
-        return ResponseEntity.ok(studentService.getStudentById(id));
+        return ResponseEntity.ok(
+                ApiResponse.<StudentResponse>builder()
+                        .success(true)
+                        .message("Student profile retrieved")
+                        .data(response)
+                        .path("/api/students/me")
+                        .build()
+        );
     }
 
-    // Create student
-    @PostMapping
-    public ResponseEntity<Student> createStudent(
-            @Valid @RequestBody StudentRegistrationRequest request) {
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<StudentResponse>> updateMyProfile(
+            Authentication authentication,
+            @Valid @RequestBody StudentProfileUpdateRequest request) {
 
-        Student student = new Student();
+        String usernameOrEmail = resolveUsernameOrEmail(authentication);
+        StudentResponse updated = studentService.updateStudentProfile(usernameOrEmail, request);
 
-        student.setFirstName(request.getFirstName());
-        student.setLastName(request.getLastName());
-        student.setEmail(request.getEmail());
-        student.setPhone(request.getPhone());
-        student.setStudentAddress(request.getStudentAddress());
-        student.setAcademicDetails(request.getStudentAcademicDetails());
-
-        return ResponseEntity.ok(studentService.createStudent(student));
+        return ResponseEntity.ok(
+                ApiResponse.<StudentResponse>builder()
+                        .success(true)
+                        .message("Profile updated successfully")
+                        .data(updated)
+                        .path("/api/students/me")
+                        .build()
+        );
     }
 }

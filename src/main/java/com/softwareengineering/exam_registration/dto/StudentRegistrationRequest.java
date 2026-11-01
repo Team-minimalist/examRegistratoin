@@ -1,36 +1,31 @@
 package com.softwareengineering.exam_registration.dto;
 
-import com.softwareengineering.exam_registration.model.StudentAcademicDetails;
-import com.softwareengineering.exam_registration.model.StudentAddress;
-
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter 
-@Setter 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class StudentRegistrationRequest {
-        @NotBlank(message = "First name is required")
-        private String firstName;
 
-        @NotBlank(message = "Last name is required")
-        private String lastName;
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+    private String username;
 
-        @NotBlank(message = "Email is required")
-        @Email(message = "Invalid Email Format")
-        private String email;
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    private String email;
 
-        @NotBlank(message = "Phone name is required")
-        private String phone;
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, max = 100, message = "Password must be at least 6 characters")
+    private String password;
 
-        @Valid //also validate the field inside the structure
-        private StudentAddress studentAddress;
-
-        @Valid 
-        private StudentAcademicDetails studentAcademicDetails;
-
-
-
+    @NotBlank(message = "Name is required")
+    private String name;
 }

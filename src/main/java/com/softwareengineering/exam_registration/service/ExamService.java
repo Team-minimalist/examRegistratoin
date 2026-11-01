@@ -1,19 +1,26 @@
 package com.softwareengineering.exam_registration.service;
 
-import com.softwareengineering.exam_registration.model.Exam;
-
 import java.util.List;
 
+import com.softwareengineering.exam_registration.dto.ExamRequest;
+import com.softwareengineering.exam_registration.dto.ExamResponse;
+import com.softwareengineering.exam_registration.model.Exam;
 
 public interface ExamService {
-    Exam getExamById(String id);
 
-    List<Exam> getAllExams();
+    List<ExamResponse> getAvailableExams();
 
-    Exam createExam(Exam exam);
+    List<ExamResponse> getAllExamsForAdmin();
 
-    Exam updateExam(String id, Exam exam);
+    ExamResponse getExamById(String id);
+
+    Exam getExamEntityById(String id);
+
+    ExamResponse createExam(ExamRequest request);
+
+    ExamResponse updateExam(String id, ExamRequest request);
+
+    ExamResponse toggleExamStatus(String id);
 
     void deleteExam(String id);
 }
-

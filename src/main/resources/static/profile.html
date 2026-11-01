@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile - Exam Registration System</title>
+    <link rel="stylesheet" href="/css/Styles.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/dashboard.html" class="nav-brand">
+            <div class="brand-badge">ER</div>
+            <div class="brand-text">
+                <h1>Exam Registration</h1>
+                <p>Student Portal</p>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/dashboard.html">Dashboard</a></li>
+            <li><a href="/profile.html" class="active">Profile</a></li>
+            <li><a href="/exams.html">Examinations</a></li>
+            <li><a href="/my-registrations.html">My Registrations</a></li>
+            <li><a href="/logout" class="btn btn-secondary btn-sm">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+                <h2>Student Profile</h2>
+                <p style="color: var(--gray); font-size: 0.9rem;">Manage your official academic and personal information</p>
+            </div>
+            <span id="completion-badge" class="badge">Loading...</span>
+        </div>
+
+        <div id="profile-alert" class="alert" style="display: none;"></div>
+
+        <form id="profile-form">
+            <!-- 1. Personal Information -->
+            <div class="card">
+                <h3 class="card-title">1. Personal Details</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Full Name <span>*</span></label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" disabled style="background: #f1f5f9; cursor: not-allowed;">
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" disabled style="background: #f1f5f9; cursor: not-allowed;">
+                    </div>
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date of Birth <span>*</span></label>
+                        <input type="date" id="dateOfBirth" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="identificationType">National ID Type <span>*</span></label>
+                        <select id="identificationType" required>
+                            <option value="">Select ID Type</option>
+                            <option value="AADHAAR">Aadhaar Card (12 digits)</option>
+                            <option value="PAN_CARD">PAN Card (10 chars, e.g. ABCDE1234F)</option>
+                            <option value="PASSPORT">Passport (8-9 chars)</option>
+                            <option value="VOTER_ID">Voter ID (10 chars)</option>
+                            <option value="DRIVING_LICENCE">Driving Licence</option>
+                            <option value="BIRTH_CERTIFICATE">Birth Certificate</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="identificationNumber">ID Number <span>*</span></label>
+                        <input type="text" id="identificationNumber" placeholder="Enter ID number" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Academic Information -->
+            <div class="card">
+                <h3 class="card-title">2. Academic Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="institutionType">Institution Type <span>*</span></label>
+                        <select id="institutionType" required>
+                            <option value="">Select Institution Type</option>
+                            <option value="College">College</option>
+                            <option value="University">University</option>
+                            <option value="School">Higher Secondary School</option>
+                            <option value="Institute">Autonomous Institute</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="institutionName">Institution Name <span>*</span></label>
+                        <input type="text" id="institutionName" placeholder="e.g. State University" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="className">Class / Degree <span>*</span></label>
+                        <input type="text" id="className" placeholder="e.g. B.Tech, 12th Grade" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stream">Stream / Major</label>
+                        <input type="text" id="stream" placeholder="e.g. Computer Science & Engineering">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input type="text" id="department" placeholder="e.g. Engineering">
+                    </div>
+                    <div class="form-group">
+                        <label for="registrationNumber">Institute Reg. Number <span>*</span></label>
+                        <input type="text" id="registrationNumber" placeholder="e.g. REG-2024-9988" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rollNumber">Roll / Student Number <span>*</span></label>
+                        <input type="text" id="rollNumber" placeholder="e.g. CS-101" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Address -->
+            <div class="card">
+                <h3 class="card-title">3. Residential Address</h3>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="address">Street Address <span>*</span></label>
+                        <input type="text" id="address" placeholder="123 Academic Way" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City <span>*</span></label>
+                        <input type="text" id="city" placeholder="City" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State / Province <span>*</span></label>
+                        <input type="text" id="state" placeholder="State" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Postal / Pincode <span>*</span></label>
+                        <input type="text" id="pincode" placeholder="Pincode" required>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 2rem;">
+                <a href="/dashboard.html" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">Save & Update Profile</button>
+            </div>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Student Examination Registration System.</p>
+    </footer>
+
+    <script src="/js/profile.js"></script>
+</body>
+</html>
+

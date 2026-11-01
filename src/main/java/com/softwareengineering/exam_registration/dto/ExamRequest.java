@@ -1,15 +1,18 @@
 package com.softwareengineering.exam_registration.dto;
 
-import jakarta.validation.constraints.Min;
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@Getter
-@Setter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExamRequest {
 
     @NotBlank(message = "Exam name is required")
@@ -17,33 +20,18 @@ public class ExamRequest {
 
     private String description;
 
-    @NotBlank(message = "Exam type is required")
-    private String examType;
+    @NotBlank(message = "Conducting organization is required")
+    private String conductingOrganization;
 
-    @NotNull(message = "Registration start time is required")
-    private LocalDateTime registrationStart;
+    @NotNull(message = "Exam date is required")
+    private LocalDate examDate;
 
-    @NotNull(message = "Registration end time is required")
-    private LocalDateTime registrationEnd;
+    @NotNull(message = "Registration start date is required")
+    private LocalDate registrationStartDate;
 
-    @NotNull(message = "Exam start time is required")
-    private LocalDateTime examStart;
+    @NotNull(message = "Registration end date is required")
+    private LocalDate registrationEndDate;
 
-    @NotNull(message = "Exam end time is required")
-    private LocalDateTime examEnd;
-
-    @NotNull(message = "Duration is required")
-    @Min(value = 1, message = "Duration must be at least 1 minute")
-    private Integer durationMinutes;
-
-    @NotNull(message = "Total marks are required")
-    @Min(value = 1, message = "Total marks must be at least 1")
-    private Integer totalMarks;
-
-    @NotNull(message = "Passing marks are required")
-    @Min(value = 1, message = "Passing marks must be at least 1")
-    private Integer passingMarks;
-
-    @NotBlank(message = "Status is required")
-    private String status;
+    @Builder.Default
+    private Boolean active = true;
 }

@@ -1,18 +1,16 @@
 package com.softwareengineering.exam_registration.service;
 
-import com.softwareengineering.exam_registration.model.ExamRegistration;
-
 import java.util.List;
+
+import com.softwareengineering.exam_registration.dto.ExamRegistrationResponse;
 
 public interface ExamRegistrationService {
 
-    ExamRegistration getRegistrationById(String id);
+    ExamRegistrationResponse registerForExam(String examId, String usernameOrEmail);
 
-    List<ExamRegistration> getAllRegistrations();
+    List<ExamRegistrationResponse> getMyRegistrations(String usernameOrEmail);
 
-    ExamRegistration createRegistration(ExamRegistration registration);
+    ExamRegistrationResponse getRegistrationById(String registrationId, String usernameOrEmail, boolean isAdmin);
 
-    ExamRegistration updateRegistration(String id, ExamRegistration registration);
-
-    void deleteRegistration(String id);
+    List<ExamRegistrationResponse> getAllRegistrationsForAdmin();
 }

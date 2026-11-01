@@ -1,40 +1,53 @@
 package com.softwareengineering.exam_registration.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(collection = "exams")
 public class Exam {
 
     @Id
     private String id;
 
+    @NotBlank(message = "Exam name is required")
     private String examName;
 
     private String description;
 
-    private String examType;
+    @NotBlank(message = "Conducting organization is required")
+    private String conductingOrganization;
 
-    private LocalDateTime registrationStart;
+    @NotNull(message = "Exam date is required")
+    private LocalDate examDate;
 
-    private LocalDateTime registrationEnd;
+    @NotNull(message = "Registration start date is required")
+    private LocalDate registrationStartDate;
 
-    private LocalDateTime examStart;
+    @NotNull(message = "Registration end date is required")
+    private LocalDate registrationEndDate;
 
-    private LocalDateTime examEnd;
+    @Builder.Default
+    private boolean active = true;
 
-    private Integer durationMinutes;
+    @CreatedDate
+    private LocalDateTime createdAt;
 
-    private Integer totalMarks;
-
-    private Integer passingMarks;
-
-    private String status;
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }

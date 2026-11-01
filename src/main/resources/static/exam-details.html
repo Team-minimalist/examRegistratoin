@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examination Details - Exam Registration System</title>
+    <link rel="stylesheet" href="/css/Styles.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/dashboard.html" class="nav-brand">
+            <div class="brand-badge">ER</div>
+            <div class="brand-text">
+                <h1>Exam Registration</h1>
+                <p>Student Portal</p>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/dashboard.html">Dashboard</a></li>
+            <li><a href="/profile.html">Profile</a></li>
+            <li><a href="/exams.html" class="active">Examinations</a></li>
+            <li><a href="/my-registrations.html">My Registrations</a></li>
+            <li><a href="/logout" class="btn btn-secondary btn-sm">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div id="details-alert" class="alert" style="display: none;"></div>
+
+        <div id="exam-details-container">
+            <p style="color: var(--gray);">Loading examination details...</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Student Examination Registration System.</p>
+    </footer>
+
+    <script src="/js/exams.js"></script>
+</body>
+</html>
+

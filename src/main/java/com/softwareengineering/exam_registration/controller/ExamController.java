@@ -1,15 +1,16 @@
 package com.softwareengineering.exam_registration.controller;
 
-import com.softwareengineering.exam_registration.dto.ExamRequest;
-import com.softwareengineering.exam_registration.model.Exam;
-import com.softwareengineering.exam_registration.service.ExamService;
-
-import jakarta.validation.Valid;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.softwareengineering.exam_registration.dto.ApiResponse;
+import com.softwareengineering.exam_registration.dto.ExamResponse;
+import com.softwareengineering.exam_registration.service.ExamService;
 
 @RestController
 @RequestMapping("/api/exams")
@@ -21,74 +22,29 @@ public class ExamController {
         this.examService = examService;
     }
 
-    @PostMapping
-    public ResponseEntity<Exam> createExam(
-            @Valid @RequestBody ExamRequest request) {
-
-        Exam exam = new Exam();
-
-        exam.setExamName(request.getExamName());
-        exam.setDescription(request.getDescription());
-        exam.setExamType(request.getExamType());
-        exam.setRegistrationStart(request.getRegistrationStart());
-        exam.setRegistrationEnd(request.getRegistrationEnd());
-        exam.setExamStart(request.getExamStart());
-        exam.setExamEnd(request.getExamEnd());
-        exam.setDurationMinutes(request.getDurationMinutes());
-        exam.setTotalMarks(request.getTotalMarks());
-        exam.setPassingMarks(request.getPassingMarks());
-        exam.setStatus(request.getStatus());
-
-        return ResponseEntity.ok(examService.createExam(exam));
-    }
-
     @GetMapping
-    public ResponseEntity<List<Exam>> getAllExams() {
-
+    public ResponseEntity<ApiResponse<List<ExamResponse>>> getAvailableExams() {
+        List<ExamResponse> exams = examService.getAvailableExams();
         return ResponseEntity.ok(
-                examService.getAllExams()
+                ApiResponse.<List<ExamResponse>>builder()
+                        .success(true)
+                        .message("Available examinations retrieved")
+                        .data(exams)
+                        .path("/api/exams")
+                        .build()
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Exam> getExamById(
-            @PathVariable String id) {
-
+    public ResponseEntity<ApiResponse<ExamResponse>> getExamById(@PathVariable String id) {
+        ExamResponse exam = examService.getExamById(id);
         return ResponseEntity.ok(
-                examService.getExamById(id)
+                ApiResponse.<ExamResponse>builder()
+                        .success(true)
+                        .message("Examination details retrieved")
+                        .data(exam)
+                        .path("/api/exams/" + id)
+                        .build()
         );
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Exam> updateExam(
-            @PathVariable String id,
-            @Valid @RequestBody ExamRequest request) {
-
-        Exam exam = new Exam();
-
-        exam.setExamName(request.getExamName());
-        exam.setDescription(request.getDescription());
-        exam.setExamType(request.getExamType());
-        exam.setRegistrationStart(request.getRegistrationStart());
-        exam.setRegistrationEnd(request.getRegistrationEnd());
-        exam.setExamStart(request.getExamStart());
-        exam.setExamEnd(request.getExamEnd());
-        exam.setDurationMinutes(request.getDurationMinutes());
-        exam.setTotalMarks(request.getTotalMarks());
-        exam.setPassingMarks(request.getPassingMarks());
-        exam.setStatus(request.getStatus());
-
-        return ResponseEntity.ok(
-                examService.updateExam(id, exam)
-        );
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExam(
-            @PathVariable String id) {
-
-        examService.deleteExam(id);
-
-        return ResponseEntity.noContent().build();
     }
 }

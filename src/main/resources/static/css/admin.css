@@ -1,0 +1,44 @@
+/* Admin Portal Styles */
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.admin-nav {
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+}
+
+.admin-nav .nav-brand,
+.admin-nav .nav-links a {
+    color: #f1f5f9;
+}
+
+.admin-nav .nav-links a:hover,
+.admin-nav .nav-links a.active {
+    color: #38bdf8;
+}
+
+.admin-nav .brand-badge {
+    background: #0284c7;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: center;
+}
+
+.filter-bar input,
+.filter-bar select {
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    outline: none;
+}
+
