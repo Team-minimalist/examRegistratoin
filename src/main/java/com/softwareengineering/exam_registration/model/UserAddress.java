@@ -12,16 +12,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserAddress {
 
-    @NotBlank(message = "Pincode is required")
-    private String pincode;
-
-    @NotBlank(message = "Address is required")
+    @NotBlank(message = "Street address is required")
     private String address;
+
+    @NotBlank(message = "City is required")
+    private String city;
 
     @NotBlank(message = "State is required")
     private String state;
 
-    @NotBlank(message = "City is required")
-    private String city;
-}
+    @NotBlank(message = "Pincode is required")
+    private String pincode;
 
+    @Builder.Default
+    private String country = "India";
+}

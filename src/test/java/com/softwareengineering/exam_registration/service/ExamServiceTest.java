@@ -4,12 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,8 +45,9 @@ class ExamServiceTest {
                 .conductingOrganization("National Testing Board")
                 .registrationStartDate(LocalDate.now().minusDays(5))
                 .registrationEndDate(LocalDate.now().plusDays(10))
-                .examDate(LocalDate.now().plusDays(20))
+                .examinationDate(LocalDate.now().plusDays(20))
                 .active(true)
+                .published(true)
                 .build();
 
         Exam savedExam = Exam.builder()
@@ -58,8 +56,9 @@ class ExamServiceTest {
                 .conductingOrganization(request.getConductingOrganization())
                 .registrationStartDate(request.getRegistrationStartDate())
                 .registrationEndDate(request.getRegistrationEndDate())
-                .examDate(request.getExamDate())
+                .examinationDate(request.getExaminationDate())
                 .active(true)
+                .published(true)
                 .build();
 
         when(examRepository.save(any(Exam.class))).thenReturn(savedExam);
@@ -78,7 +77,7 @@ class ExamServiceTest {
                 .conductingOrganization("Board")
                 .registrationStartDate(LocalDate.now().plusDays(10))
                 .registrationEndDate(LocalDate.now().plusDays(5)) // end before start!
-                .examDate(LocalDate.now().plusDays(20))
+                .examinationDate(LocalDate.now().plusDays(20))
                 .build();
 
         assertThrows(InvalidRegistrationException.class, () -> examService.createExam(invalidDates));
@@ -91,10 +90,9 @@ class ExamServiceTest {
                 .conductingOrganization("Board")
                 .registrationStartDate(LocalDate.now().minusDays(5))
                 .registrationEndDate(LocalDate.now().plusDays(15))
-                .examDate(LocalDate.now().plusDays(10)) // exam before reg end!
+                .examinationDate(LocalDate.now().plusDays(10)) // exam before reg end!
                 .build();
 
         assertThrows(InvalidRegistrationException.class, () -> examService.createExam(invalidDates));
     }
 }
-

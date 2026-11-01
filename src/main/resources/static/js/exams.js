@@ -25,15 +25,21 @@ async function loadExamList() {
                 return;
             }
 
-            grid.innerHTML = exams.map(exam => `
+            grid.innerHTML = exams.map(exam => {
+                const dateVal = exam.examinationDate || exam.examDate || 'TBA';
+                const statusClass = (exam.registrationStatus || 'closed').toLowerCase().replace('_', '-');
+                return `
                 <div class="exam-card">
                     <div class="exam-card-header">
-                        <h3 class="exam-card-title">${escapeHtml(exam.examName)}</h3>
-                        <span class="badge badge-${exam.registrationStatus.toLowerCase().replace('_', '-')}">${exam.registrationStatus}</span>
+                        <div>
+                            <h3 class="exam-card-title">${escapeHtml(exam.examName)}</h3>
+                            <small style="color:var(--gray);">${escapeHtml(exam.examCode || '')}</small>
+                        </div>
+                        <span class="badge badge-${statusClass}">${exam.registrationStatus}</span>
                     </div>
                     <p class="exam-card-meta">
                         <strong>Organization:</strong> ${escapeHtml(exam.conductingOrganization)}<br>
-                        <strong>Exam Date:</strong> ${exam.examDate}<br>
+                        <strong>Exam Date:</strong> ${dateVal}<br>
                         <strong>Registration Window:</strong> ${exam.registrationStartDate} to ${exam.registrationEndDate}
                     </p>
                     <p style="font-size: 0.9rem; color: #4b5563; margin-bottom: 1rem; line-height: 1.4;">
@@ -47,7 +53,7 @@ async function loadExamList() {
                         }
                     </div>
                 </div>
-            `).join("");
+            `}).join("");
         }
     } catch (err) {
         console.error("Error loading exams:", err);
@@ -75,6 +81,7 @@ async function loadExamDetails() {
         }
 
         const exam = data.data;
+        const dateVal = exam.examinationDate || exam.examDate || 'TBA';
 
         // Check if student profile is complete
         let profileCompleted = true;
@@ -88,11 +95,16 @@ async function loadExamDetails() {
             // Ignore if not logged in
         }
 
+        const statusClass = (exam.registrationStatus || 'closed').toLowerCase().replace('_', '-');
+
         container.innerHTML = `
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-                    <h2>${escapeHtml(exam.examName)}</h2>
-                    <span class="badge badge-${exam.registrationStatus.toLowerCase().replace('_', '-')}">${exam.registrationStatus}</span>
+                    <div>
+                        <h2>${escapeHtml(exam.examName)}</h2>
+                        <span style="color:var(--gray); font-size:0.9rem;">Code: <strong>${escapeHtml(exam.examCode || 'N/A')}</strong></span>
+                    </div>
+                    <span class="badge badge-${statusClass}">${exam.registrationStatus}</span>
                 </div>
                 <div class="form-grid" style="margin-bottom: 1.5rem;">
                     <div class="form-group">
@@ -101,7 +113,7 @@ async function loadExamDetails() {
                     </div>
                     <div class="form-group">
                         <label>Exam Date</label>
-                        <p style="font-size: 1rem; font-weight: 500;">${exam.examDate}</p>
+                        <p style="font-size: 1rem; font-weight: 500;">${dateVal}</p>
                     </div>
                     <div class="form-group">
                         <label>Registration Start Date</label>
@@ -180,4 +192,3 @@ function escapeHtml(str) {
         '"': '&quot;'
     }[tag] || tag));
 }
-

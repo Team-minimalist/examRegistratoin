@@ -22,18 +22,28 @@ async function loadAdminStats() {
     try {
         const res = await fetch("/api/admin/stats");
         if (res.status === 403 || res.status === 401) {
-            window.location.href = "/login.html";
+            window.location.href = "/admin-login.html";
             return;
         }
 
         const data = await res.json();
         if (res.ok && data.success) {
             const stats = data.data;
-            document.getElementById("stat-total-students").textContent = stats.totalStudents || 0;
-            document.getElementById("stat-active-students").textContent = stats.activeStudents || 0;
-            document.getElementById("stat-total-exams").textContent = stats.totalExams || 0;
-            document.getElementById("stat-open-exams").textContent = stats.openExams || 0;
-            document.getElementById("stat-total-registrations").textContent = stats.totalRegistrations || 0;
+            if (document.getElementById("stat-total-students")) {
+                document.getElementById("stat-total-students").textContent = stats.totalStudents || 0;
+            }
+            if (document.getElementById("stat-active-students")) {
+                document.getElementById("stat-active-students").textContent = stats.activeStudents || 0;
+            }
+            if (document.getElementById("stat-total-exams")) {
+                document.getElementById("stat-total-exams").textContent = stats.totalExams || 0;
+            }
+            if (document.getElementById("stat-open-exams")) {
+                document.getElementById("stat-open-exams").textContent = stats.activeExams || 0;
+            }
+            if (document.getElementById("stat-total-registrations")) {
+                document.getElementById("stat-total-registrations").textContent = stats.totalRegistrations || 0;
+            }
         }
     } catch (err) {
         console.error("Error loading admin stats:", err);
@@ -55,13 +65,16 @@ async function loadAdminExams() {
                 return;
             }
 
-            tbody.innerHTML = exams.map(exam => `
+            tbody.innerHTML = exams.map(exam => {
+                const examDateVal = exam.examinationDate || exam.examDate || 'N/A';
+                const statusClass = (exam.registrationStatus || 'closed').toLowerCase().replace('_', '-');
+                return `
                 <tr>
-                    <td><strong>${escapeHtml(exam.examName)}</strong></td>
+                    <td><strong>${escapeHtml(exam.examName)}</strong><br><small style="color:var(--gray);">${escapeHtml(exam.examCode || '')}</small></td>
                     <td>${escapeHtml(exam.conductingOrganization)}</td>
-                    <td>${exam.examDate}</td>
+                    <td>${examDateVal}</td>
                     <td>${exam.registrationStartDate} to ${exam.registrationEndDate}</td>
-                    <td><span class="badge badge-${exam.registrationStatus.toLowerCase().replace('_', '-')}">${exam.registrationStatus}</span></td>
+                    <td><span class="badge badge-${statusClass}">${exam.registrationStatus || 'UNKNOWN'}</span></td>
                     <td>
                         <button onclick="toggleExamStatus('${exam.id}')" class="btn btn-sm ${exam.active ? 'btn-secondary' : 'btn-success'}">
                             ${exam.active ? 'Deactivate' : 'Activate'}
@@ -72,7 +85,7 @@ async function loadAdminExams() {
                         <button onclick="deleteExam('${exam.id}')" class="btn btn-danger btn-sm">Delete</button>
                     </td>
                 </tr>
-            `).join("");
+            `}).join("");
         }
     } catch (err) {
         console.error("Error loading exams:", err);
@@ -117,19 +130,22 @@ async function initCreateEditExam() {
     const alertBox = document.getElementById("admin-exam-alert");
 
     if (examId) {
-        titleHeader.textContent = "Edit Examination";
+        if (titleHeader) titleHeader.textContent = "Edit Examination";
         try {
             const res = await fetch(`/api/exams/${examId}`);
             const data = await res.json();
             if (res.ok && data.success) {
                 const e = data.data;
-                document.getElementById("examName").value = e.examName;
+                document.getElementById("examName").value = e.examName || "";
+                if (document.getElementById("examCode")) document.getElementById("examCode").value = e.examCode || "";
                 document.getElementById("description").value = e.description || "";
-                document.getElementById("conductingOrganization").value = e.conductingOrganization;
-                document.getElementById("examDate").value = e.examDate;
-                document.getElementById("registrationStartDate").value = e.registrationStartDate;
-                document.getElementById("registrationEndDate").value = e.registrationEndDate;
-                document.getElementById("active").checked = e.active;
+                document.getElementById("conductingOrganization").value = e.conductingOrganization || "";
+                const dateVal = e.examinationDate || e.examDate || "";
+                if (document.getElementById("examDate")) document.getElementById("examDate").value = dateVal;
+                if (document.getElementById("examinationDate")) document.getElementById("examinationDate").value = dateVal;
+                document.getElementById("registrationStartDate").value = e.registrationStartDate || "";
+                document.getElementById("registrationEndDate").value = e.registrationEndDate || "";
+                if (document.getElementById("active")) document.getElementById("active").checked = e.active;
             }
         } catch (err) {
             console.error(err);
@@ -140,15 +156,21 @@ async function initCreateEditExam() {
         e.preventDefault();
         alertBox.style.display = "none";
 
+        const examDateField = document.getElementById("examinationDate") || document.getElementById("examDate");
+
         const payload = {
             examName: document.getElementById("examName").value.trim(),
             description: document.getElementById("description").value.trim(),
             conductingOrganization: document.getElementById("conductingOrganization").value.trim(),
-            examDate: document.getElementById("examDate").value,
+            examinationDate: examDateField ? examDateField.value : "",
             registrationStartDate: document.getElementById("registrationStartDate").value,
             registrationEndDate: document.getElementById("registrationEndDate").value,
-            active: document.getElementById("active").checked
+            active: document.getElementById("active") ? document.getElementById("active").checked : true
         };
+
+        if (document.getElementById("examCode") && document.getElementById("examCode").value.trim()) {
+            payload.examCode = document.getElementById("examCode").value.trim();
+        }
 
         const method = examId ? "PUT" : "POST";
         const url = examId ? `/api/admin/exams/${examId}` : "/api/admin/exams";
@@ -259,17 +281,19 @@ function renderAdminRegistrations(list) {
         return;
     }
 
-    tbody.innerHTML = list.map(reg => `
+    tbody.innerHTML = list.map(reg => {
+        const dateVal = reg.examinationDate || reg.examDate || 'N/A';
+        return `
         <tr>
             <td><strong>${escapeHtml(reg.registrationNumber)}</strong></td>
             <td>${escapeHtml(reg.studentName)}</td>
             <td>${escapeHtml(reg.studentEmail)}</td>
             <td>${escapeHtml(reg.examName)}</td>
-            <td>${reg.examDate || 'N/A'}</td>
+            <td>${dateVal}</td>
             <td>${reg.registeredAt ? reg.registeredAt.substring(0, 10) : 'N/A'}</td>
             <td><span class="badge badge-open">${reg.status}</span></td>
         </tr>
-    `).join("");
+    `}).join("");
 }
 
 function filterRegistrations() {
@@ -294,4 +318,3 @@ function escapeHtml(str) {
         '"': '&quot;'
     }[tag] || tag));
 }
-

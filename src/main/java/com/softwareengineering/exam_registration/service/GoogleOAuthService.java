@@ -1,6 +1,8 @@
 package com.softwareengineering.exam_registration.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -10,92 +12,83 @@ import org.springframework.stereotype.Service;
 
 import com.softwareengineering.exam_registration.model.AuthProvider;
 import com.softwareengineering.exam_registration.model.Role;
-import com.softwareengineering.exam_registration.model.Users;
-import com.softwareengineering.exam_registration.repository.UserRepository;
+import com.softwareengineering.exam_registration.model.Student;
+import com.softwareengineering.exam_registration.repository.StudentRepository;
 
 @Service
 public class GoogleOAuthService {
 
     private static final Logger log = LoggerFactory.getLogger(GoogleOAuthService.class);
-    private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
 
-    public GoogleOAuthService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public GoogleOAuthService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
     }
 
-    /**
-     * Processes or links an authenticated Google OAuth2 user.
-     * Follows safe account linking rules:
-     * 1. Search by Google ID.
-     * 2. If not found, search by email.
-     * 3. If found by email, safely link googleId without overwriting password/profile.
-     * 4. Otherwise, create a new student account with authProvider=GOOGLE and profileCompleted=false.
-     */
-    public Users processGoogleUser(OAuth2User oauth2User) {
+    public Student processGoogleStudent(OAuth2User oauth2User) {
         String googleId = oauth2User.getAttribute("sub");
         String email = oauth2User.getAttribute("email");
         String name = oauth2User.getAttribute("name");
 
         if (email == null) {
-            throw new IllegalArgumentException("Google OAuth2 login did not return an email address");
+            throw new IllegalArgumentException("Google identity did not provide a verified email address.");
         }
 
-        // 1. Search by Google ID
+        // 1. Search existing student by Google ID
         if (googleId != null) {
-            Optional<Users> userByGoogleId = userRepository.findByGoogleId(googleId);
-            if (userByGoogleId.isPresent()) {
-                log.info("Existing Google user authenticated: {}", email);
-                return userByGoogleId.get();
+            Optional<Student> studentByGoogleId = studentRepository.findByGoogleId(googleId);
+            if (studentByGoogleId.isPresent()) {
+                log.info("Student authenticated via Google: {}", email);
+                return studentByGoogleId.get();
             }
         }
 
-        // 2. Search by email
-        Optional<Users> userByEmail = userRepository.findByEmail(email);
-        if (userByEmail.isPresent()) {
-            Users existing = userByEmail.get();
-            log.info("Safe account linking for email {}: attaching Google ID", email);
+        // 2. Search existing student by verified email
+        Optional<Student> studentByEmail = studentRepository.findByEmail(email);
+        if (studentByEmail.isPresent()) {
+            Student existing = studentByEmail.get();
+            log.info("Safe linking student account for email: {}", email);
             if (existing.getGoogleId() == null && googleId != null) {
                 existing.setGoogleId(googleId);
                 existing.setUpdatedAt(LocalDateTime.now());
-                return userRepository.save(existing);
+                return studentRepository.save(existing);
             }
             return existing;
         }
 
-        // 3. Create new student record for first-time Google login
-        log.info("Creating new student account for first-time Google user: {}", email);
+        // 3. Provision new student account for first-time Google user
+        log.info("Provisioning new student account for Google user: {}", email);
         String baseUsername = email.contains("@") ? email.substring(0, email.indexOf("@")) : email;
-        String uniqueUsername = generateUniqueUsername(baseUsername);
+        String uniqueUsername = generateUniqueStudentUsername(baseUsername);
 
-        Users newUser = Users.builder()
+        Student newStudent = Student.builder()
                 .username(uniqueUsername)
                 .email(email)
                 .name(name != null && !name.trim().isEmpty() ? name : uniqueUsername)
                 .googleId(googleId)
                 .authProvider(AuthProvider.GOOGLE)
-                .role(Role.STUDENT)
+                .roles(new HashSet<>(Collections.singletonList(Role.ROLE_STUDENT)))
                 .active(true)
                 .profileCompleted(false)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        return userRepository.save(newUser);
+        return studentRepository.save(newStudent);
     }
 
-    private String generateUniqueUsername(String baseUsername) {
+    private String generateUniqueStudentUsername(String baseUsername) {
         String username = baseUsername.replaceAll("[^a-zA-Z0-9._-]", "");
         if (username.isEmpty()) {
             username = "student";
         }
-        if (!userRepository.existsByUsername(username)) {
+        if (!studentRepository.existsByUsername(username)) {
             return username;
         }
         int count = 1;
-        while (userRepository.existsByUsername(username + count)) {
+        while (studentRepository.existsByUsername(username + count)) {
             count++;
         }
         return username + count;
     }
 }
-

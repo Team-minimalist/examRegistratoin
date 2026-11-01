@@ -28,18 +28,20 @@ async function loadMyRegistrations() {
                 return;
             }
 
-            tbody.innerHTML = list.map(reg => `
+            tbody.innerHTML = list.map(reg => {
+                const dateVal = reg.examinationDate || reg.examDate || 'N/A';
+                return `
                 <tr>
                     <td><strong>${escapeHtml(reg.registrationNumber)}</strong></td>
-                    <td>${escapeHtml(reg.examName)}</td>
+                    <td>${escapeHtml(reg.examName)}<br><small style="color:var(--gray);">${escapeHtml(reg.examCode || '')}</small></td>
                     <td>${escapeHtml(reg.conductingOrganization)}</td>
-                    <td>${reg.examDate || 'N/A'}</td>
+                    <td>${dateVal}</td>
                     <td><span class="badge badge-open">${reg.status}</span></td>
                     <td>
                         <a href="/registration-success.html?id=${reg.id}" class="btn btn-secondary btn-sm">View Slip / Print</a>
                     </td>
                 </tr>
-            `).join("");
+            `}).join("");
         }
     } catch (err) {
         console.error("Error loading my registrations:", err);
@@ -66,6 +68,7 @@ async function loadRegistrationSlip() {
         }
 
         const reg = data.data;
+        const dateVal = reg.examinationDate || reg.examDate || 'N/A';
 
         container.innerHTML = `
             <div class="confirmation-slip">
@@ -80,7 +83,7 @@ async function loadRegistrationSlip() {
                 <div class="slip-details-grid">
                     <div class="slip-field">
                         <span class="field-label">Registration Number</span>
-                        <span class="field-value" style="color: var(--primary); font-size: 1.25rem;">${escapeHtml(reg.registrationNumber)}</span>
+                        <span class="field-value" style="color: var(--primary); font-size: 1.25rem; font-family: monospace;">${escapeHtml(reg.registrationNumber)}</span>
                     </div>
                     <div class="slip-field">
                         <span class="field-label">Registration Date</span>
@@ -96,7 +99,7 @@ async function loadRegistrationSlip() {
                     </div>
                     <div class="slip-field full-width">
                         <span class="field-label">Examination Name</span>
-                        <span class="field-value">${escapeHtml(reg.examName)}</span>
+                        <span class="field-value">${escapeHtml(reg.examName)} ${reg.examCode ? '(' + escapeHtml(reg.examCode) + ')' : ''}</span>
                     </div>
                     <div class="slip-field">
                         <span class="field-label">Conducting Organization</span>
@@ -104,7 +107,7 @@ async function loadRegistrationSlip() {
                     </div>
                     <div class="slip-field">
                         <span class="field-label">Scheduled Exam Date</span>
-                        <span class="field-value" style="color: #b91c1c;">${reg.examDate}</span>
+                        <span class="field-value" style="color: #b91c1c;">${dateVal}</span>
                     </div>
                 </div>
 
@@ -137,4 +140,3 @@ function escapeHtml(str) {
         '"': '&quot;'
     }[tag] || tag));
 }
-

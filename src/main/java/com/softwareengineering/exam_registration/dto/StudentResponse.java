@@ -2,6 +2,7 @@ package com.softwareengineering.exam_registration.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import com.softwareengineering.exam_registration.model.AcademicDetails;
 import com.softwareengineering.exam_registration.model.AuthProvider;
@@ -26,13 +27,13 @@ public class StudentResponse {
     private LocalDate dateOfBirth;
     private IdentificationType identificationType;
     private String identificationNumber;
+    private String contactNumber;
     private AcademicDetails academicDetails;
     private UserAddress address;
     private AuthProvider authProvider;
-    private Role role;
+    private Set<Role> roles;
     private boolean active;
     private boolean profileCompleted;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
-

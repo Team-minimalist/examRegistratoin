@@ -1,6 +1,5 @@
 package com.softwareengineering.exam_registration.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -10,7 +9,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -22,11 +20,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "users")
-public class Users {
+@Document(collection = "admins")
+public class Admin {
 
     @Id
     private String id;
+
+    @NotBlank(message = "Full name is required")
+    private String name;
 
     @Indexed(unique = true)
     @NotBlank(message = "Username is required")
@@ -40,34 +41,17 @@ public class Users {
     @JsonIgnore
     private String password;
 
-    @NotBlank(message = "Name is required")
-    private String name;
+    private String department;
 
-    private LocalDate dateOfBirth;
+    private String designation;
 
-    private IdentificationType identificationType;
-
-    private String identificationNumber;
-
-    @Valid
-    private AcademicDetails academicDetails;
-
-    @Valid
-    private UserAddress address;
+    private String contactNumber;
 
     @Builder.Default
-    private AuthProvider authProvider = AuthProvider.LOCAL;
-
-    private String googleId;
-
-    @Builder.Default
-    private Role role = Role.STUDENT;
+    private Role role = Role.ROLE_ADMIN;
 
     @Builder.Default
     private boolean active = true;
-
-    @Builder.Default
-    private boolean profileCompleted = false;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -75,4 +59,3 @@ public class Users {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 }
-

@@ -13,22 +13,23 @@ import lombok.NoArgsConstructor;
 public class AcademicDetails {
 
     @NotBlank(message = "Institution type is required")
-    private String institutionType;
+    private String institutionType; // SCHOOL, COLLEGE, UNIVERSITY
 
     @NotBlank(message = "Institution name is required")
     private String institutionName;
-
-    @NotBlank(message = "Class name is required")
-    private String className;
-
-    private String stream;
-
-    private String department;
 
     @NotBlank(message = "Registration number is required")
     private String registrationNumber;
 
     @NotBlank(message = "Roll number is required")
     private String rollNumber;
-}
 
+    // For SCHOOL
+    private String className;
+
+    // For SCHOOL, COLLEGE, UNIVERSITY
+    private String stream;
+
+    // For COLLEGE, UNIVERSITY
+    private String department;
+}

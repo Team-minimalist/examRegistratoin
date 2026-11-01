@@ -21,10 +21,12 @@ public class ExamRegistrationResponse {
     private String studentEmail;
     private String examId;
     private String examName;
+    private String examCode;
     private String conductingOrganization;
-    private LocalDate examDate;
+    private LocalDate examinationDate;
     private String registrationNumber;
     private LocalDateTime registeredAt;
     private RegistrationStatus status;
+    private String paymentStatus;
+    private LocalDateTime updatedAt;
 }
-

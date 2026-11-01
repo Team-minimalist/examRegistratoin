@@ -22,5 +22,7 @@ public interface ExamService {
 
     ExamResponse toggleExamStatus(String id);
 
+    ExamResponse toggleExamPublishStatus(String id);
+
     void deleteExam(String id);
 }

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Registration - Examination Portal</title>
+    <link rel="stylesheet" href="/css/Styles.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <style>
+        .admin-badge {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <div class="auth-card" style="max-width: 520px;">
+        <div class="auth-header">
+            <span class="admin-badge">ADMINISTRATOR PROVISIONING</span>
+            <h2>Register Administrator</h2>
+            <p>Enroll as an authorized examination portal administrator</p>
+        </div>
+
+        <div id="admin-reg-alert" class="alert" style="display: none;"></div>
+
+        <form id="admin-reg-form">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="adminName">Full Name <span>*</span></label>
+                    <input type="text" id="adminName" placeholder="Dr. S. K. Sharma" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="adminUsername">Username <span>*</span></label>
+                    <input type="text" id="adminUsername" placeholder="sk_sharma" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="adminEmail">Official Email Address <span>*</span></label>
+                <input type="email" id="adminEmail" placeholder="sharma@examportal.gov.in" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="adminDepartment">Department</label>
+                    <input type="text" id="adminDepartment" placeholder="Examinations Cell">
+                </div>
+                <div class="form-group">
+                    <label for="adminDesignation">Designation</label>
+                    <input type="text" id="adminDesignation" placeholder="Deputy Controller">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="adminContact">Contact Number</label>
+                <input type="tel" id="adminContact" placeholder="+91 9876543210">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="adminPass">Password <span>*</span></label>
+                    <input type="password" id="adminPass" placeholder="At least 6 characters" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminConfirmPass">Confirm Password <span>*</span></label>
+                    <input type="password" id="adminConfirmPass" placeholder="Confirm password" required>
+                </div>
+            </div>
+
+            <div class="form-group" style="background: #f8fafc; padding: 0.85rem; border-radius: 8px; border: 1px dashed #cbd5e1;">
+                <label for="adminInvitationCode" style="color: #1e3a8a; font-weight: 700;">Invitation / Passcode <span>*</span></label>
+                <input type="text" id="adminInvitationCode" placeholder="Enter administrative authorization code" required>
+                <small style="color: var(--gray); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                    Default initial code: <code>ADMIN-SECRET-2026</code>
+                </small>
+            </div>
+
+            <button type="submit" id="admin-reg-btn" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 1rem; margin-top: 0.75rem;">
+                Register Administrator Account
+            </button>
+        </form>
+
+        <div class="auth-footer" style="margin-top: 1.5rem;">
+            Already have an administrative account? <a href="/admin-login.html">Admin Sign In</a>
+            <div style="margin-top: 0.75rem;">
+                <a href="/" style="color: var(--gray); font-size: 0.8rem;">&larr; Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('admin-reg-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const alertBox = document.getElementById('admin-reg-alert');
+            const submitBtn = document.getElementById('admin-reg-btn');
+            alertBox.style.display = 'none';
+
+            const name = document.getElementById('adminName').value.trim();
+            const username = document.getElementById('adminUsername').value.trim();
+            const email = document.getElementById('adminEmail').value.trim();
+            const department = document.getElementById('adminDepartment').value.trim();
+            const designation = document.getElementById('adminDesignation').value.trim();
+            const contactNumber = document.getElementById('adminContact').value.trim();
+            const password = document.getElementById('adminPass').value;
+            const confirmPassword = document.getElementById('adminConfirmPass').value;
+            const invitationCode = document.getElementById('adminInvitationCode').value.trim();
+
+            if (password !== confirmPassword) {
+                alertBox.className = 'alert alert-danger';
+                alertBox.textContent = 'Passwords do not match.';
+                alertBox.style.display = 'block';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Registering...';
+
+            try {
+                const response = await fetch('/api/admin/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        username,
+                        email,
+                        department,
+                        designation,
+                        contactNumber,
+                        password,
+                        confirmPassword,
+                        invitationCode
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alertBox.className = 'alert alert-success';
+                    alertBox.textContent = 'Administrator registered successfully! Redirecting to login...';
+                    alertBox.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = '/admin-login.html';
+                    }, 1200);
+                } else {
+                    alertBox.className = 'alert alert-danger';
+                    alertBox.textContent = data.message || 'Registration failed. Please verify the invitation code.';
+                    alertBox.style.display = 'block';
+                }
+            } catch (err) {
+                alertBox.className = 'alert alert-danger';
+                alertBox.textContent = 'Connection error. Please try again.';
+                alertBox.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Register Administrator Account';
+            }
+        });
+    </script>
+</body>
+</html>

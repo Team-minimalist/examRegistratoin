@@ -7,8 +7,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.softwareengineering.exam_registration.model.Role;
-import com.softwareengineering.exam_registration.model.Users;
+import com.softwareengineering.exam_registration.model.Student;
 import com.softwareengineering.exam_registration.service.GoogleOAuthService;
 
 import jakarta.servlet.ServletException;
@@ -30,14 +29,9 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                                         Authentication authentication) throws IOException, ServletException {
 
         if (authentication.getPrincipal() instanceof OAuth2User oauth2User) {
-            Users user = googleOAuthService.processGoogleUser(oauth2User);
+            Student student = googleOAuthService.processGoogleStudent(oauth2User);
 
-            if (user.getRole() == Role.ADMIN) {
-                response.sendRedirect("/admin/dashboard.html");
-                return;
-            }
-
-            if (!user.isProfileCompleted()) {
+            if (!student.isProfileCompleted()) {
                 response.sendRedirect("/profile.html?status=incomplete");
             } else {
                 response.sendRedirect("/dashboard.html");
@@ -47,4 +41,3 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         }
     }
 }
-

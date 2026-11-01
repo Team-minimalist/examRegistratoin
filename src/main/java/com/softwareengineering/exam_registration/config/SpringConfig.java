@@ -2,6 +2,7 @@ package com.softwareengineering.exam_registration.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,33 +32,44 @@ public class SpringConfig {
             "/index.html",
             "/login.html",
             "/signup.html",
+            "/student-login.html",
+            "/student-signup.html",
+            "/admin-login.html",
+            "/admin-registration.html",
             "/css/**",
             "/js/**",
             "/images/**",
+            "/favicon.ico",
             "/error",
             "/api/auth/**",
+            "/api/admin/auth/**",
             "/oauth2/**",
             "/login/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
-            "/v3/api-docs/**"
+            "/v3/api-docs/**",
+            "/actuator/**"
     };
 
     private static final String[] ADMIN_PATHS = {
             "/admin/**",
+            "/manage-students.html",
+            "/manage-exams.html",
+            "/manage-registrations.html",
             "/api/admin/**"
     };
 
-    private static final String[] AUTHENTICATED_PATHS = {
+    private static final String[] STUDENT_PATHS = {
             "/dashboard.html",
+            "/student-dashboard.html",
             "/profile.html",
+            "/student-profile.html",
             "/exams.html",
+            "/available-exams.html",
             "/exam-details.html",
             "/my-registrations.html",
             "/registration-success.html",
-            "/api/students/**",
-            "/api/exams/**",
-            "/api/registrations/**"
+            "/api/students/**"
     };
 
     @Bean
@@ -66,8 +78,10 @@ public class SpringConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_PATHS).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/exams", "/api/exams/**").permitAll()
                         .requestMatchers(ADMIN_PATHS).hasRole("ADMIN")
-                        .requestMatchers(AUTHENTICATED_PATHS).authenticated()
+                        .requestMatchers(STUDENT_PATHS).hasRole("STUDENT")
+                        .requestMatchers("/api/registrations/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -102,4 +116,3 @@ public class SpringConfig {
         return authConfig.getAuthenticationManager();
     }
 }
-

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Registrations - Admin</title>
+    <link rel="stylesheet" href="/css/Styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <nav class="navbar admin-nav">
+        <a href="/admin/dashboard.html" class="nav-brand">
+            <div class="brand-badge">ADM</div>
+            <div class="brand-text">
+                <h1 style="color: #fff;">Admin Portal</h1>
+                <p style="color: #94a3b8;">Exam Registration System</p>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/admin/dashboard.html">Overview</a></li>
+            <li><a href="/admin/exams.html">Manage Exams</a></li>
+            <li><a href="/admin/students.html">Students</a></li>
+            <li><a href="/admin/registrations.html" class="active">Registrations</a></li>
+            <li><a href="/logout" class="btn btn-secondary btn-sm">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h2>Examination Registrations</h2>
+                <p style="color: var(--gray); font-size: 0.95rem;">Audit all submitted student examination applications.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="filter-bar">
+                <input type="text" id="reg-search" oninput="filterRegistrations()" placeholder="Search by Reg No, Candidate, Email, or Exam..." style="width: 380px;">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Registration No.</th>
+                            <th>Student Name</th>
+                            <th>Student Email</th>
+                            <th>Examination</th>
+                            <th>Exam Date</th>
+                            <th>Applied On</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-registrations-tbody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: var(--gray); padding: 2rem;">Loading registrations...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Student Examination Registration System — Administrator Console</p>
+    </footer>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>
+

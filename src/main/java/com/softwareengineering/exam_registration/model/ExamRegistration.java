@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,9 +25,14 @@ public class ExamRegistration {
     @Id
     private String id;
 
+    @Indexed
     private String studentId;
 
+    @Indexed
     private String examId;
+
+    @Indexed(unique = true)
+    private String registrationNumber;
 
     @CreatedDate
     private LocalDateTime registeredAt;
@@ -34,6 +40,9 @@ public class ExamRegistration {
     @Builder.Default
     private RegistrationStatus status = RegistrationStatus.REGISTERED;
 
-    @Indexed(unique = true)
-    private String registrationNumber;
+    @Builder.Default
+    private String paymentStatus = "EXEMPT";
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }

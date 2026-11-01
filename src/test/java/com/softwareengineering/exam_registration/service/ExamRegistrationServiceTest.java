@@ -22,10 +22,10 @@ import com.softwareengineering.exam_registration.exception.InvalidRegistrationEx
 import com.softwareengineering.exam_registration.model.Exam;
 import com.softwareengineering.exam_registration.model.ExamRegistration;
 import com.softwareengineering.exam_registration.model.RegistrationStatus;
-import com.softwareengineering.exam_registration.model.Users;
+import com.softwareengineering.exam_registration.model.Student;
 import com.softwareengineering.exam_registration.repository.ExamRegistrationRepository;
 import com.softwareengineering.exam_registration.repository.ExamRepository;
-import com.softwareengineering.exam_registration.repository.UserRepository;
+import com.softwareengineering.exam_registration.repository.StudentRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ExamRegistrationServiceTest {
@@ -37,25 +37,26 @@ class ExamRegistrationServiceTest {
     private ExamRepository examRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private StudentRepository studentRepository;
 
     private ExamRegistrationService examRegistrationService;
 
     @BeforeEach
     void setUp() {
         examRegistrationService = new ExamRegistrationServiceImp(
-                examRegistrationRepository, examRepository, userRepository);
+                examRegistrationRepository, examRepository, studentRepository);
     }
 
     @Test
     void testRegisterProfileIncompleteFails() {
-        Users incompleteStudent = Users.builder()
+        Student incompleteStudent = Student.builder()
                 .id("std-1")
                 .username("student1")
+                .active(true)
                 .profileCompleted(false)
                 .build();
 
-        when(userRepository.findByUsername("student1")).thenReturn(Optional.of(incompleteStudent));
+        when(studentRepository.findByUsername("student1")).thenReturn(Optional.of(incompleteStudent));
 
         assertThrows(InvalidRegistrationException.class, () ->
                 examRegistrationService.registerForExam("exam-1", "student1"));
@@ -63,9 +64,10 @@ class ExamRegistrationServiceTest {
 
     @Test
     void testRegisterClosedExamFails() {
-        Users completedStudent = Users.builder()
+        Student completedStudent = Student.builder()
                 .id("std-1")
                 .username("student1")
+                .active(true)
                 .profileCompleted(true)
                 .build();
 
@@ -75,11 +77,12 @@ class ExamRegistrationServiceTest {
                 .conductingOrganization("Board")
                 .registrationStartDate(LocalDate.now().minusDays(20))
                 .registrationEndDate(LocalDate.now().minusDays(5))
-                .examDate(LocalDate.now().plusDays(5))
+                .examinationDate(LocalDate.now().plusDays(5))
                 .active(true)
+                .published(true)
                 .build();
 
-        when(userRepository.findByUsername("student1")).thenReturn(Optional.of(completedStudent));
+        when(studentRepository.findByUsername("student1")).thenReturn(Optional.of(completedStudent));
         when(examRepository.findById("exam-1")).thenReturn(Optional.of(closedExam));
 
         assertThrows(InvalidRegistrationException.class, () ->
@@ -88,9 +91,10 @@ class ExamRegistrationServiceTest {
 
     @Test
     void testRegisterDuplicateFails() {
-        Users completedStudent = Users.builder()
+        Student completedStudent = Student.builder()
                 .id("std-1")
                 .username("student1")
+                .active(true)
                 .profileCompleted(true)
                 .build();
 
@@ -100,11 +104,12 @@ class ExamRegistrationServiceTest {
                 .conductingOrganization("Board")
                 .registrationStartDate(LocalDate.now().minusDays(2))
                 .registrationEndDate(LocalDate.now().plusDays(10))
-                .examDate(LocalDate.now().plusDays(20))
+                .examinationDate(LocalDate.now().plusDays(20))
                 .active(true)
+                .published(true)
                 .build();
 
-        when(userRepository.findByUsername("student1")).thenReturn(Optional.of(completedStudent));
+        when(studentRepository.findByUsername("student1")).thenReturn(Optional.of(completedStudent));
         when(examRepository.findById("exam-1")).thenReturn(Optional.of(openExam));
         when(examRegistrationRepository.existsByStudentIdAndExamId("std-1", "exam-1")).thenReturn(true);
 
@@ -114,11 +119,12 @@ class ExamRegistrationServiceTest {
 
     @Test
     void testRegisterSuccess() {
-        Users completedStudent = Users.builder()
+        Student completedStudent = Student.builder()
                 .id("std-1")
                 .username("student1")
                 .name("Student One")
                 .email("student1@example.com")
+                .active(true)
                 .profileCompleted(true)
                 .build();
 
@@ -128,11 +134,12 @@ class ExamRegistrationServiceTest {
                 .conductingOrganization("Board")
                 .registrationStartDate(LocalDate.now().minusDays(2))
                 .registrationEndDate(LocalDate.now().plusDays(10))
-                .examDate(LocalDate.now().plusDays(20))
+                .examinationDate(LocalDate.now().plusDays(20))
                 .active(true)
+                .published(true)
                 .build();
 
-        when(userRepository.findByUsername("student1")).thenReturn(Optional.of(completedStudent));
+        when(studentRepository.findByUsername("student1")).thenReturn(Optional.of(completedStudent));
         when(examRepository.findById("exam-1")).thenReturn(Optional.of(openExam));
         when(examRegistrationRepository.existsByStudentIdAndExamId("std-1", "exam-1")).thenReturn(false);
 
@@ -151,4 +158,3 @@ class ExamRegistrationServiceTest {
         assertEquals(RegistrationStatus.REGISTERED, response.getStatus());
     }
 }
-

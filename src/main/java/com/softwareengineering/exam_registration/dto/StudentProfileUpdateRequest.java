@@ -32,6 +32,8 @@ public class StudentProfileUpdateRequest {
     @NotBlank(message = "Identification number is required")
     private String identificationNumber;
 
+    private String contactNumber;
+
     @NotNull(message = "Academic details are required")
     @Valid
     private AcademicDetails academicDetails;
@@ -40,4 +42,3 @@ public class StudentProfileUpdateRequest {
     @Valid
     private UserAddress address;
 }
-

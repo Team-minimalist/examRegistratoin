@@ -13,4 +13,6 @@ public interface ExamRegistrationService {
     ExamRegistrationResponse getRegistrationById(String registrationId, String usernameOrEmail, boolean isAdmin);
 
     List<ExamRegistrationResponse> getAllRegistrationsForAdmin();
+
+    ExamRegistrationResponse cancelRegistration(String registrationId, String usernameOrEmail, boolean isAdmin);
 }

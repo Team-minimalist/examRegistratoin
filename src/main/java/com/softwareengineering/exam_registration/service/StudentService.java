@@ -5,7 +5,7 @@ import java.util.List;
 import com.softwareengineering.exam_registration.dto.StudentProfileUpdateRequest;
 import com.softwareengineering.exam_registration.dto.StudentRegistrationRequest;
 import com.softwareengineering.exam_registration.dto.StudentResponse;
-import com.softwareengineering.exam_registration.model.Users;
+import com.softwareengineering.exam_registration.model.Student;
 
 public interface StudentService {
 
@@ -15,13 +15,15 @@ public interface StudentService {
 
     StudentResponse updateStudentProfile(String usernameOrEmail, StudentProfileUpdateRequest request);
 
-    Users getUserByUsernameOrEmail(String usernameOrEmail);
+    Student getStudentByUsernameOrEmail(String usernameOrEmail);
 
     List<StudentResponse> getAllStudents();
 
     StudentResponse getStudentById(String id);
 
     StudentResponse toggleStudentActiveStatus(String id);
+
+    List<StudentResponse> searchStudents(String query);
 
     void deleteStudent(String id);
 }

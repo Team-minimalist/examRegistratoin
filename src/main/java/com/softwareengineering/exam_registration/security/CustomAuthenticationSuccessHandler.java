@@ -7,9 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.softwareengineering.exam_registration.model.Role;
-import com.softwareengineering.exam_registration.model.Users;
-import com.softwareengineering.exam_registration.repository.UserRepository;
+import com.softwareengineering.exam_registration.model.Student;
+import com.softwareengineering.exam_registration.repository.StudentRepository;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,10 +17,10 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
 
-    public CustomAuthenticationSuccessHandler(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public CustomAuthenticationSuccessHandler(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
     }
 
     @Override
@@ -39,15 +38,14 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         }
 
         String principalName = authentication.getName();
-        Users user = userRepository.findByUsername(principalName)
-                .or(() -> userRepository.findByEmail(principalName))
+        Student student = studentRepository.findByUsername(principalName)
+                .or(() -> studentRepository.findByEmail(principalName))
                 .orElse(null);
 
-        if (user != null && !user.isProfileCompleted()) {
+        if (student != null && !student.isProfileCompleted()) {
             response.sendRedirect("/profile.html?status=incomplete");
         } else {
             response.sendRedirect("/dashboard.html");
         }
     }
 }
-

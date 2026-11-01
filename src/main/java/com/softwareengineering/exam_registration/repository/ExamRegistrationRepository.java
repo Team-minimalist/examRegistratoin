@@ -20,6 +20,8 @@ public interface ExamRegistrationRepository extends MongoRepository<ExamRegistra
 
     boolean existsByStudentIdAndExamId(String studentId, String examId);
 
+    long countByExamId(String examId);
+
     Optional<ExamRegistration> findByRegistrationNumber(String registrationNumber);
 
     long countByStatus(RegistrationStatus status);

@@ -1,13 +1,19 @@
 package com.softwareengineering.exam_registration.controller;
 
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softwareengineering.exam_registration.dto.ApiResponse;
+import com.softwareengineering.exam_registration.dto.LoginRequest;
 import com.softwareengineering.exam_registration.dto.StudentRegistrationRequest;
 import com.softwareengineering.exam_registration.dto.StudentResponse;
-import com.softwareengineering.exam_registration.model.Users;
 import com.softwareengineering.exam_registration.service.StudentService;
-import com.softwareengineering.exam_registration.util.StudentUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @RestController
@@ -28,12 +36,16 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     private final StudentService studentService;
+    private final AuthenticationManager authenticationManager;
+    private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
-    public AuthController(StudentService studentService) {
+    public AuthController(StudentService studentService,
+                          AuthenticationManager authenticationManager) {
         this.studentService = studentService;
+        this.authenticationManager = authenticationManager;
     }
 
-    @PostMapping("/register")
+    @PostMapping({"/register", "/signup"})
     public ResponseEntity<ApiResponse<StudentResponse>> register(
             @Valid @RequestBody StudentRegistrationRequest request) {
 
@@ -47,6 +59,57 @@ public class AuthController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<StudentResponse>> login(
+            @Valid @RequestBody LoginRequest loginRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail().trim(), loginRequest.getPassword());
+
+        Authentication authentication = authenticationManager.authenticate(authToken);
+
+        boolean isStudent = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_STUDENT") || a.getAuthority().equals("STUDENT"));
+
+        if (!isStudent) {
+            throw new BadCredentialsException("Access denied: Not a student account.");
+        }
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        securityContextRepository.saveContext(context, request, response);
+
+        StudentResponse student = studentService.getStudentProfile(authentication.getName());
+
+        return ResponseEntity.ok(
+                ApiResponse.<StudentResponse>builder()
+                        .success(true)
+                        .message("Student authenticated successfully.")
+                        .data(student)
+                        .path("/api/auth/login")
+                        .build()
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
+        SecurityContextHolder.clearContext();
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .message("Logged out successfully.")
+                        .path("/api/auth/logout")
+                        .build()
+        );
     }
 
     @GetMapping("/me")

@@ -1,44 +1,23 @@
 package com.softwareengineering.exam_registration.util;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
-import java.time.Year;
 
+import com.softwareengineering.exam_registration.dto.AdminResponse;
 import com.softwareengineering.exam_registration.dto.ExamRegistrationResponse;
 import com.softwareengineering.exam_registration.dto.ExamResponse;
 import com.softwareengineering.exam_registration.dto.StudentResponse;
+import com.softwareengineering.exam_registration.model.Admin;
 import com.softwareengineering.exam_registration.model.Exam;
 import com.softwareengineering.exam_registration.model.ExamRegistration;
-import com.softwareengineering.exam_registration.model.Users;
+import com.softwareengineering.exam_registration.model.Student;
 
 public class StudentUtil {
 
-    private static final String ALPHANUMERIC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    private static final SecureRandom RANDOM = new SecureRandom();
-
     private StudentUtil() {
-        // Utility class
     }
 
-    /**
-     * Generates a unique, student-safe registration number.
-     * Example format: EXAM-2026-XXXXXXXX
-     */
-    public static String generateRegistrationNumber() {
-        int year = Year.now().getValue();
-        StringBuilder sb = new StringBuilder(8);
-        for (int i = 0; i < 8; i++) {
-            sb.append(ALPHANUMERIC.charAt(RANDOM.nextInt(ALPHANUMERIC.length())));
-        }
-        return "EXAM-" + year + "-" + sb.toString();
-    }
-
-    /**
-     * Computes the dynamic registration status of an examination.
-     * Possible values: NOT_STARTED, OPEN, CLOSED, COMPLETED, INACTIVE
-     */
     public static String calculateExamStatus(Exam exam) {
-        if (exam == null || !exam.isActive()) {
+        if (exam == null || !exam.isActive() || !exam.isPublished()) {
             return "INACTIVE";
         }
 
@@ -50,10 +29,10 @@ public class StudentUtil {
         if (!today.isBefore(exam.getRegistrationStartDate()) && !today.isAfter(exam.getRegistrationEndDate())) {
             return "OPEN";
         }
-        if (today.isAfter(exam.getRegistrationEndDate()) && !today.isAfter(exam.getExamDate())) {
+        if (today.isAfter(exam.getRegistrationEndDate()) && !today.isAfter(exam.getExaminationDate())) {
             return "CLOSED";
         }
-        if (today.isAfter(exam.getExamDate())) {
+        if (today.isAfter(exam.getExaminationDate())) {
             return "COMPLETED";
         }
         return "CLOSED";
@@ -63,30 +42,54 @@ public class StudentUtil {
         return "OPEN".equalsIgnoreCase(calculateExamStatus(exam));
     }
 
-    public static StudentResponse toStudentResponse(Users user) {
-        if (user == null) {
+    public static StudentResponse toStudentResponse(Student student) {
+        if (student == null) {
             return null;
         }
         return StudentResponse.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .name(user.getName())
-                .dateOfBirth(user.getDateOfBirth())
-                .identificationType(user.getIdentificationType())
-                .identificationNumber(user.getIdentificationNumber())
-                .academicDetails(user.getAcademicDetails())
-                .address(user.getAddress())
-                .authProvider(user.getAuthProvider())
-                .role(user.getRole())
-                .active(user.isActive())
-                .profileCompleted(user.isProfileCompleted())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
+                .id(student.getId())
+                .username(student.getUsername())
+                .email(student.getEmail())
+                .name(student.getName())
+                .dateOfBirth(student.getDateOfBirth())
+                .identificationType(student.getIdentificationType())
+                .identificationNumber(student.getIdentificationNumber())
+                .contactNumber(student.getContactNumber())
+                .academicDetails(student.getAcademicDetails())
+                .address(student.getAddress())
+                .authProvider(student.getAuthProvider())
+                .roles(student.getRoles())
+                .active(student.isActive())
+                .profileCompleted(student.isProfileCompleted())
+                .createdAt(student.getCreatedAt())
+                .updatedAt(student.getUpdatedAt())
+                .build();
+    }
+
+    public static AdminResponse toAdminResponse(Admin admin) {
+        if (admin == null) {
+            return null;
+        }
+        return AdminResponse.builder()
+                .id(admin.getId())
+                .name(admin.getName())
+                .username(admin.getUsername())
+                .email(admin.getEmail())
+                .department(admin.getDepartment())
+                .designation(admin.getDesignation())
+                .contactNumber(admin.getContactNumber())
+                .role(admin.getRole())
+                .active(admin.isActive())
+                .createdAt(admin.getCreatedAt())
+                .updatedAt(admin.getUpdatedAt())
                 .build();
     }
 
     public static ExamResponse toExamResponse(Exam exam) {
+        return toExamResponse(exam, null);
+    }
+
+    public static ExamResponse toExamResponse(Exam exam, Long currentRegistrations) {
         if (exam == null) {
             return null;
         }
@@ -94,12 +97,20 @@ public class StudentUtil {
         return ExamResponse.builder()
                 .id(exam.getId())
                 .examName(exam.getExamName())
+                .examCode(exam.getExamCode())
                 .description(exam.getDescription())
                 .conductingOrganization(exam.getConductingOrganization())
-                .examDate(exam.getExamDate())
+                .examinationType(exam.getExaminationType())
+                .examinationDate(exam.getExaminationDate())
                 .registrationStartDate(exam.getRegistrationStartDate())
                 .registrationEndDate(exam.getRegistrationEndDate())
+                .applicationFee(exam.getApplicationFee())
+                .eligibilityCriteria(exam.getEligibilityCriteria())
+                .maximumCandidates(exam.getMaximumCandidates())
+                .currentRegistrations(currentRegistrations)
+                .examinationLocation(exam.getExaminationLocation())
                 .active(exam.isActive())
+                .published(exam.isPublished())
                 .registrationStatus(status)
                 .canRegister("OPEN".equalsIgnoreCase(status))
                 .createdAt(exam.getCreatedAt())
@@ -107,23 +118,25 @@ public class StudentUtil {
                 .build();
     }
 
-    public static ExamRegistrationResponse toRegistrationResponse(ExamRegistration reg, Users student, Exam exam) {
+    public static ExamRegistrationResponse toRegistrationResponse(ExamRegistration reg, Student student, Exam exam) {
         if (reg == null) {
             return null;
         }
         return ExamRegistrationResponse.builder()
                 .id(reg.getId())
                 .studentId(reg.getStudentId())
-                .studentName(student != null ? student.getName() : "Unknown")
-                .studentEmail(student != null ? student.getEmail() : "Unknown")
+                .studentName(student != null ? student.getName() : "Unknown Candidate")
+                .studentEmail(student != null ? student.getEmail() : "Unknown Email")
                 .examId(reg.getExamId())
-                .examName(exam != null ? exam.getExamName() : "Unknown Exam")
+                .examName(exam != null ? exam.getExamName() : "Unknown Examination")
+                .examCode(exam != null ? exam.getExamCode() : "")
                 .conductingOrganization(exam != null ? exam.getConductingOrganization() : "")
-                .examDate(exam != null ? exam.getExamDate() : null)
+                .examinationDate(exam != null ? exam.getExaminationDate() : null)
                 .registrationNumber(reg.getRegistrationNumber())
                 .registeredAt(reg.getRegisteredAt())
                 .status(reg.getStatus())
+                .paymentStatus(reg.getPaymentStatus())
+                .updatedAt(reg.getUpdatedAt())
                 .build();
     }
 }
-

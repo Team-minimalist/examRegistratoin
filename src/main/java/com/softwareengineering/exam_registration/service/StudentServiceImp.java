@@ -1,6 +1,8 @@
 package com.softwareengineering.exam_registration.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,112 +16,128 @@ import com.softwareengineering.exam_registration.exception.DuplicateResourceExce
 import com.softwareengineering.exam_registration.exception.ResourceNotFoundException;
 import com.softwareengineering.exam_registration.model.AuthProvider;
 import com.softwareengineering.exam_registration.model.Role;
-import com.softwareengineering.exam_registration.model.Users;
-import com.softwareengineering.exam_registration.repository.UserRepository;
+import com.softwareengineering.exam_registration.model.Student;
+import com.softwareengineering.exam_registration.repository.StudentRepository;
 import com.softwareengineering.exam_registration.util.StudentUtil;
 
 @Service
 public class StudentServiceImp implements StudentService {
 
-    private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
     private final PasswordEncoder passwordEncoder;
     private final IdentificationService identificationService;
 
-    public StudentServiceImp(UserRepository userRepository,
+    public StudentServiceImp(StudentRepository studentRepository,
                              PasswordEncoder passwordEncoder,
                              IdentificationService identificationService) {
-        this.userRepository = userRepository;
+        this.studentRepository = studentRepository;
         this.passwordEncoder = passwordEncoder;
         this.identificationService = identificationService;
     }
 
     @Override
     public StudentResponse registerStudent(StudentRegistrationRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (studentRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("Username '" + request.getUsername() + "' is already taken");
         }
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (studentRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email '" + request.getEmail() + "' is already registered");
         }
 
-        Users student = Users.builder()
+        Student student = Student.builder()
                 .username(request.getUsername().trim())
                 .email(request.getEmail().trim().toLowerCase())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName().trim())
                 .authProvider(AuthProvider.LOCAL)
-                .role(Role.STUDENT)
+                .roles(new HashSet<>(Collections.singletonList(Role.ROLE_STUDENT)))
                 .active(true)
                 .profileCompleted(false)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        Users saved = userRepository.save(student);
+        Student saved = studentRepository.save(student);
         return StudentUtil.toStudentResponse(saved);
     }
 
     @Override
     public StudentResponse getStudentProfile(String usernameOrEmail) {
-        Users user = getUserByUsernameOrEmail(usernameOrEmail);
-        return StudentUtil.toStudentResponse(user);
+        Student student = getStudentByUsernameOrEmail(usernameOrEmail);
+        return StudentUtil.toStudentResponse(student);
     }
 
     @Override
     public StudentResponse updateStudentProfile(String usernameOrEmail, StudentProfileUpdateRequest request) {
-        Users user = getUserByUsernameOrEmail(usernameOrEmail);
+        Student student = getStudentByUsernameOrEmail(usernameOrEmail);
 
-        identificationService.validateIdentification(request.getIdentificationType(), request.getIdentificationNumber());
+        identificationService.validateIdentification(
+                request.getIdentificationType(),
+                request.getIdentificationNumber(),
+                request.getDateOfBirth()
+        );
 
-        user.setName(request.getName().trim());
-        user.setDateOfBirth(request.getDateOfBirth());
-        user.setIdentificationType(request.getIdentificationType());
-        user.setIdentificationNumber(request.getIdentificationNumber().trim().toUpperCase());
-        user.setAcademicDetails(request.getAcademicDetails());
-        user.setAddress(request.getAddress());
-        user.setProfileCompleted(true);
-        user.setUpdatedAt(LocalDateTime.now());
+        student.setName(request.getName().trim());
+        student.setDateOfBirth(request.getDateOfBirth());
+        student.setIdentificationType(request.getIdentificationType());
+        student.setIdentificationNumber(request.getIdentificationNumber().trim().toUpperCase());
+        student.setContactNumber(request.getContactNumber());
+        student.setAcademicDetails(request.getAcademicDetails());
+        student.setAddress(request.getAddress());
+        student.setProfileCompleted(true);
+        student.setUpdatedAt(LocalDateTime.now());
 
-        Users saved = userRepository.save(user);
+        Student saved = studentRepository.save(student);
         return StudentUtil.toStudentResponse(saved);
     }
 
     @Override
-    public Users getUserByUsernameOrEmail(String usernameOrEmail) {
-        return userRepository.findByUsername(usernameOrEmail)
-                .or(() -> userRepository.findByEmail(usernameOrEmail))
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with username or email: " + usernameOrEmail));
+    public Student getStudentByUsernameOrEmail(String usernameOrEmail) {
+        return studentRepository.findByUsername(usernameOrEmail)
+                .or(() -> studentRepository.findByEmail(usernameOrEmail))
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with username or email: " + usernameOrEmail));
     }
 
     @Override
     public List<StudentResponse> getAllStudents() {
-        return userRepository.findByRole(Role.STUDENT).stream()
+        return studentRepository.findAll().stream()
                 .map(StudentUtil::toStudentResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public StudentResponse getStudentById(String id) {
-        Users user = userRepository.findById(id)
+        Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + id));
-        return StudentUtil.toStudentResponse(user);
+        return StudentUtil.toStudentResponse(student);
     }
 
     @Override
     public StudentResponse toggleStudentActiveStatus(String id) {
-        Users user = userRepository.findById(id)
+        Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + id));
-        user.setActive(!user.isActive());
-        user.setUpdatedAt(LocalDateTime.now());
-        Users saved = userRepository.save(user);
+        student.setActive(!student.isActive());
+        student.setUpdatedAt(LocalDateTime.now());
+        Student saved = studentRepository.save(student);
         return StudentUtil.toStudentResponse(saved);
     }
 
     @Override
+    public List<StudentResponse> searchStudents(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return getAllStudents();
+        }
+        String q = query.trim();
+        return studentRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrUsernameContainingIgnoreCase(q, q, q)
+                .stream()
+                .map(StudentUtil::toStudentResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deleteStudent(String id) {
-        Users user = userRepository.findById(id)
+        Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + id));
-        userRepository.delete(user);
+        studentRepository.delete(student);
     }
 }
-

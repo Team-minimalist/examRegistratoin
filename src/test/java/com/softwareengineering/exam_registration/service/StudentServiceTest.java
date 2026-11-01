@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.HashSet;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,14 +23,14 @@ import com.softwareengineering.exam_registration.dto.StudentResponse;
 import com.softwareengineering.exam_registration.exception.DuplicateResourceException;
 import com.softwareengineering.exam_registration.model.AuthProvider;
 import com.softwareengineering.exam_registration.model.Role;
-import com.softwareengineering.exam_registration.model.Users;
-import com.softwareengineering.exam_registration.repository.UserRepository;
+import com.softwareengineering.exam_registration.model.Student;
+import com.softwareengineering.exam_registration.repository.StudentRepository;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private StudentRepository studentRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -40,7 +42,7 @@ class StudentServiceTest {
 
     @BeforeEach
     void setUp() {
-        studentService = new StudentServiceImp(userRepository, passwordEncoder, identificationService);
+        studentService = new StudentServiceImp(studentRepository, passwordEncoder, identificationService);
     }
 
     @Test
@@ -52,22 +54,22 @@ class StudentServiceTest {
                 .name("John Doe")
                 .build();
 
-        when(userRepository.existsByUsername("john_doe")).thenReturn(false);
-        when(userRepository.existsByEmail("john@example.com")).thenReturn(false);
+        when(studentRepository.existsByUsername("john_doe")).thenReturn(false);
+        when(studentRepository.existsByEmail("john@example.com")).thenReturn(false);
         when(passwordEncoder.encode("Secret@123")).thenReturn("hashedPassword");
 
-        Users savedUser = Users.builder()
-                .id("u-1")
+        Student savedStudent = Student.builder()
+                .id("s-1")
                 .username("john_doe")
                 .email("john@example.com")
                 .name("John Doe")
-                .role(Role.STUDENT)
+                .roles(new HashSet<>(Collections.singletonList(Role.ROLE_STUDENT)))
                 .authProvider(AuthProvider.LOCAL)
                 .active(true)
                 .profileCompleted(false)
                 .build();
 
-        when(userRepository.save(any(Users.class))).thenReturn(savedUser);
+        when(studentRepository.save(any(Student.class))).thenReturn(savedStudent);
 
         StudentResponse response = studentService.registerStudent(request);
 
@@ -87,7 +89,7 @@ class StudentServiceTest {
                 .name("John Doe")
                 .build();
 
-        when(userRepository.existsByUsername("existing_user")).thenReturn(true);
+        when(studentRepository.existsByUsername("existing_user")).thenReturn(true);
 
         assertThrows(DuplicateResourceException.class, () -> studentService.registerStudent(request));
     }
@@ -101,10 +103,9 @@ class StudentServiceTest {
                 .name("John Doe")
                 .build();
 
-        when(userRepository.existsByUsername("new_user")).thenReturn(false);
-        when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
+        when(studentRepository.existsByUsername("new_user")).thenReturn(false);
+        when(studentRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
         assertThrows(DuplicateResourceException.class, () -> studentService.registerStudent(request));
     }
 }
-

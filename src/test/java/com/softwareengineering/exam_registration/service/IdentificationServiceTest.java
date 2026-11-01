@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.softwareengineering.exam_registration.exception.InvalidRegistrationException;
+import com.softwareengineering.exam_registration.exception.InvalidIdentificationException;
 import com.softwareengineering.exam_registration.model.IdentificationType;
 
 class IdentificationServiceTest {
@@ -25,7 +25,7 @@ class IdentificationServiceTest {
 
     @Test
     void testInvalidAadhaar() {
-        assertThrows(InvalidRegistrationException.class, () ->
+        assertThrows(InvalidIdentificationException.class, () ->
                 identificationService.validateIdentification(IdentificationType.AADHAAR, "12345"));
     }
 
@@ -36,14 +36,13 @@ class IdentificationServiceTest {
 
     @Test
     void testInvalidPan() {
-        assertThrows(InvalidRegistrationException.class, () ->
+        assertThrows(InvalidIdentificationException.class, () ->
                 identificationService.validateIdentification(IdentificationType.PAN_CARD, "12345ABCDE"));
     }
 
     @Test
     void testNullIdentificationType() {
-        assertThrows(InvalidRegistrationException.class, () ->
+        assertThrows(InvalidIdentificationException.class, () ->
                 identificationService.validateIdentification(null, "12345"));
     }
 }
-

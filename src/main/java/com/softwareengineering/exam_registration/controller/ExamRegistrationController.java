@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -93,6 +94,25 @@ public class ExamRegistrationController {
                         .message("Registration details retrieved")
                         .data(response)
                         .path("/api/registrations/" + id)
+                        .build()
+        );
+    }
+
+    @PatchMapping("/api/registrations/{id}/cancel")
+    public ResponseEntity<ApiResponse<ExamRegistrationResponse>> cancelRegistration(
+            @PathVariable String id,
+            Authentication authentication) {
+
+        String usernameOrEmail = resolveUsernameOrEmail(authentication);
+        boolean isAdmin = checkIsAdmin(authentication);
+        ExamRegistrationResponse response = examRegistrationService.cancelRegistration(id, usernameOrEmail, isAdmin);
+
+        return ResponseEntity.ok(
+                ApiResponse.<ExamRegistrationResponse>builder()
+                        .success(true)
+                        .message("Registration cancelled successfully")
+                        .data(response)
+                        .path("/api/registrations/" + id + "/cancel")
                         .build()
         );
     }

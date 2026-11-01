@@ -3,8 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Examination Registration System</title>
+    <title>Examination Registration and Management System</title>
     <link rel="stylesheet" href="/css/Styles.css">
+    <style>
+        .portal-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 850px;
+            margin: 2rem auto;
+            text-align: left;
+        }
+        .portal-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .portal-card.admin-card {
+            border-top: 4px solid #1e3a8a;
+        }
+        .portal-card.student-card {
+            border-top: 4px solid #0284c7;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -17,43 +43,60 @@
         </a>
         <ul class="nav-links">
             <li><a href="/exams.html">Examinations</a></li>
-            <li><a href="/login.html" class="btn btn-secondary btn-sm">Log In</a></li>
-            <li><a href="/signup.html" class="btn btn-primary btn-sm">Sign Up</a></li>
+            <li><a href="/login.html" class="btn btn-secondary btn-sm">Student Login</a></li>
+            <li><a href="/admin-login.html" class="btn btn-primary btn-sm" style="background: #1e3a8a;">Admin Portal</a></li>
         </ul>
     </nav>
 
-    <main class="container" style="text-align: center; padding-top: 4rem; padding-bottom: 4rem;">
+    <main class="container" style="text-align: center; padding-top: 3rem; padding-bottom: 4rem;">
         <span class="badge badge-open" style="font-size: 0.85rem; padding: 0.4rem 1rem; margin-bottom: 1.5rem;">2026 Examination Season Open</span>
         <h1 style="font-size: 2.75rem; font-weight: 800; color: #0f172a; margin-bottom: 1.25rem; line-height: 1.2;">
-            Welcome to the Student<br>Examination Registration Portal
+            National Examination Registration<br>&amp; Management System
         </h1>
-        <p style="font-size: 1.15rem; color: #475569; max-width: 650px; margin: 0 auto 2.5rem; line-height: 1.6;">
-            Register seamlessly for national and university examinations, manage your academic profile, view upcoming schedules, and download verified registration slips.
+        <p style="font-size: 1.15rem; color: #475569; max-width: 650px; margin: 0 auto 2rem; line-height: 1.6;">
+            A unified digital portal for candidates to browse upcoming examinations, submit applications, manage academic profiles, and receive verified examination confirmation slips.
         </p>
 
-        <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 3.5rem;">
-            <a href="/signup.html" class="btn btn-primary" style="padding: 0.85rem 2rem; font-size: 1.05rem;">Register as Student</a>
-            <a href="/login.html" class="btn btn-secondary" style="padding: 0.85rem 2rem; font-size: 1.05rem;">Student / Admin Login</a>
+        <div class="portal-cards">
+            <!-- Student Portal Card -->
+            <div class="portal-card student-card">
+                <div>
+                    <span class="badge badge-open" style="font-size: 0.75rem;">CANDIDATE ACCESS</span>
+                    <h2 style="font-size: 1.5rem; margin: 0.75rem 0 0.5rem; color: #0f172a;">Student Portal</h2>
+                    <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5;">
+                        Create an account or sign in with Google, complete your academic profile, browse active examinations, and download admission confirmation slips.
+                    </p>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <a href="/login.html" class="btn btn-primary" style="flex: 1; text-align: center;">Candidate Login</a>
+                    <a href="/signup.html" class="btn btn-secondary" style="flex: 1; text-align: center;">Register</a>
+                </div>
+            </div>
+
+            <!-- Admin Portal Card -->
+            <div class="portal-card admin-card">
+                <div>
+                    <span class="badge" style="background: #1e3a8a; color: #fff; font-size: 0.75rem;">ADMINISTRATION</span>
+                    <h2 style="font-size: 1.5rem; margin: 0.75rem 0 0.5rem; color: #0f172a;">Admin Directorate</h2>
+                    <p style="color: #64748b; font-size: 0.95rem; line-height: 1.5;">
+                        Authorized portal for examination controllers to create and publish exams, monitor candidate registrations, review student details, and export reports.
+                    </p>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <a href="/admin-login.html" class="btn btn-primary" style="background: #1e3a8a; border-color: #1e3a8a; flex: 1; text-align: center;">Admin Sign In</a>
+                    <a href="/admin-registration.html" class="btn btn-secondary" style="flex: 1; text-align: center;">Enroll Admin</a>
+                </div>
+            </div>
         </div>
 
-        <div class="stats-grid" style="text-align: left; max-width: 850px; margin: 0 auto;">
-            <div class="stat-card">
-                <span class="stat-label">Fast Digital Registration</span>
-                <span style="font-size: 0.95rem; color: #4b5563; margin-top: 0.5rem;">Register in minutes using local credentials or your Google account.</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Instant Confirmation</span>
-                <span style="font-size: 0.95rem; color: #4b5563; margin-top: 0.5rem;">Generate unique examination registration slips with printable validation.</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Centralized Management</span>
-                <span style="font-size: 0.95rem; color: #4b5563; margin-top: 0.5rem;">Track all your registered examinations and academic details in one place.</span>
-            </div>
+        <div style="margin-top: 2.5rem;">
+            <a href="/exams.html" class="btn btn-secondary" style="margin-right: 0.75rem;">Browse Open Examinations &rarr;</a>
+            <a href="/swagger-ui.html" target="_blank" class="btn btn-secondary">OpenAPI Documentation &rarr;</a>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2026 Student Examination Registration System. Built with Spring Boot and MongoDB.</p>
+        <p>&copy; 2026 Examination Registration and Management System. Powered by Spring Boot, MongoDB, and Spring Security.</p>
     </footer>
 </body>
 </html>
