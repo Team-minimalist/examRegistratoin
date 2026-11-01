@@ -1,0 +1,116 @@
+/* Auth Pages (Login & Signup) */
+
+.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #f1f5f9;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 440px;
+    padding: 2.25rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+}
+
+.auth-header .logo-badge {
+    width: 50px;
+    height: 50px;
+    background: var(--primary);
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.auth-header h2 {
+    font-size: 1.4rem;
+    color: var(--dark);
+    margin-bottom: 0.35rem;
+}
+
+.auth-header p {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: var(--gray);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+}
+
+.divider span {
+    padding: 0 0.75rem;
+}
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.7rem;
+    width: 100%;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.btn-google:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.btn-google svg {
+    width: 18px;
+    height: 18px;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+.auth-footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+

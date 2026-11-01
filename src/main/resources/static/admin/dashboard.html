@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Exam Registration System</title>
+    <link rel="stylesheet" href="/css/Styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <nav class="navbar admin-nav">
+        <a href="/admin/dashboard.html" class="nav-brand">
+            <div class="brand-badge">ADM</div>
+            <div class="brand-text">
+                <h1 style="color: #fff;">Admin Portal</h1>
+                <p style="color: #94a3b8;">Exam Registration System</p>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/admin/dashboard.html" class="active">Overview</a></li>
+            <li><a href="/admin/exams.html">Manage Exams</a></li>
+            <li><a href="/admin/students.html">Students</a></li>
+            <li><a href="/admin/registrations.html">Registrations</a></li>
+            <li><a href="/logout" class="btn btn-secondary btn-sm">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="admin-container" id="admin-stats-container">
+        <div class="admin-header">
+            <div>
+                <h2>System Overview & Statistics</h2>
+                <p style="color: var(--gray); font-size: 0.95rem;">Real-time metrics on examinations, candidates, and registrations.</p>
+            </div>
+            <div>
+                <a href="/admin/create-exam.html" class="btn btn-primary">+ Create New Examination</a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-label">Total Registered Students</span>
+                <span class="stat-value" id="stat-total-students">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Active Student Accounts</span>
+                <span class="stat-value" id="stat-active-students" style="color: var(--success);">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Total Examinations</span>
+                <span class="stat-value" id="stat-total-exams">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Currently Open for Reg.</span>
+                <span class="stat-value" id="stat-open-exams" style="color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-label">Total Registrations</span>
+                <span class="stat-value" id="stat-total-registrations">0</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Quick Administration Actions</h3>
+            <p class="card-subtitle">Manage examinations, candidate status, and view registration records.</p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="/admin/create-exam.html" class="btn btn-primary">Schedule New Exam</a>
+                <a href="/admin/exams.html" class="btn btn-secondary">Manage All Exams</a>
+                <a href="/admin/students.html" class="btn btn-secondary">View Students List</a>
+                <a href="/admin/registrations.html" class="btn btn-secondary">Review Exam Registrations</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Student Examination Registration System — Administrator Console</p>
+    </footer>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>
+

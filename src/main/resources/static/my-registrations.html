@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Registrations - Exam Registration System</title>
+    <link rel="stylesheet" href="/css/Styles.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/dashboard.html" class="nav-brand">
+            <div class="brand-badge">ER</div>
+            <div class="brand-text">
+                <h1>Exam Registration</h1>
+                <p>Student Portal</p>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/dashboard.html">Dashboard</a></li>
+            <li><a href="/profile.html">Profile</a></li>
+            <li><a href="/exams.html">Examinations</a></li>
+            <li><a href="/my-registrations.html" class="active">My Registrations</a></li>
+            <li><a href="/logout" class="btn btn-secondary btn-sm">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div style="margin-bottom: 2rem;">
+            <h2>My Registered Examinations</h2>
+            <p style="color: var(--gray); font-size: 0.95rem;">Review your active examination applications and download your verification slips.</p>
+        </div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Registration Number</th>
+                            <th>Exam Name</th>
+                            <th>Conducting Org</th>
+                            <th>Exam Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="my-registrations-tbody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: var(--gray); padding: 2rem;">Loading your registrations...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Student Examination Registration System.</p>
+    </footer>
+
+    <script src="/js/registrations.js"></script>
+</body>
+</html>
+
