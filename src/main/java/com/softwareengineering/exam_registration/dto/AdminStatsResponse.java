@@ -19,3 +19,4 @@ public class AdminStatsResponse {
     private long activeRegistrations;
     private long cancelledRegistrations;
 }
+

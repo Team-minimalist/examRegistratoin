@@ -9,3 +9,4 @@ public class InvalidIdentificationException extends RuntimeException {
         super(message);
     }
 }
+

@@ -39,3 +39,4 @@ public class AdminRegistrationRequest {
 
     private String invitationCode;
 }
+

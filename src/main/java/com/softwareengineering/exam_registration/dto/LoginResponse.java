@@ -18,3 +18,4 @@ public class LoginResponse {
     private boolean profileCompleted;
     private String redirectUrl;
 }
+

@@ -26,3 +26,4 @@ public class AdminResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
+

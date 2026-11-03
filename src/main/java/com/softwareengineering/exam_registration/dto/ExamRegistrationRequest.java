@@ -14,3 +14,4 @@ public class ExamRegistrationRequest {
     @NotBlank(message = "Exam ID is required")
     private String examId;
 }
+

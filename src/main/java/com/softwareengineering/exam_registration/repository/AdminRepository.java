@@ -20,3 +20,4 @@ public interface AdminRepository extends MongoRepository<Admin, String> {
 
     long countByActiveTrue();
 }
+

@@ -59,3 +59,4 @@ public class Admin {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 }
+

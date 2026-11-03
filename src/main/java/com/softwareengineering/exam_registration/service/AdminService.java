@@ -17,3 +17,4 @@ public interface AdminService {
 
     void bootstrapInitialAdmin(String email, String password, String name, String username);
 }
+

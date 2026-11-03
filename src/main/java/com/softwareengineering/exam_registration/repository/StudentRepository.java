@@ -26,3 +26,4 @@ public interface StudentRepository extends MongoRepository<Student, String> {
     List<Student> findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrUsernameContainingIgnoreCase(
             String name, String email, String username);
 }
+

@@ -143,3 +143,4 @@ class AdminServiceTest {
         assertEquals(250L, stats.getTotalRegistrations());
     }
 }
+
