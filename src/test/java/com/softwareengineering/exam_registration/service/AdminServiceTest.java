@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +17,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.softwareengineering.exam_registration.dto.AdminRegistrationRequest;
 import com.softwareengineering.exam_registration.dto.AdminResponse;
 import com.softwareengineering.exam_registration.dto.AdminStatsResponse;
-import com.softwareengineering.exam_registration.exception.DuplicateResourceException;
 import com.softwareengineering.exam_registration.exception.InvalidRegistrationException;
 import com.softwareengineering.exam_registration.model.Admin;
 import com.softwareengineering.exam_registration.model.RegistrationStatus;
@@ -27,7 +25,6 @@ import com.softwareengineering.exam_registration.repository.AdminRepository;
 import com.softwareengineering.exam_registration.repository.ExamRegistrationRepository;
 import com.softwareengineering.exam_registration.repository.ExamRepository;
 import com.softwareengineering.exam_registration.repository.StudentRepository;
-
 @ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
 
