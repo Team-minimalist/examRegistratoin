@@ -1,0 +1,36 @@
+
+name: Spring Boot CI
+
+on:
+  push:
+    branches: [ "main", "controllerAndDto" ]
+  pull_request:
+    branches: [ "main", "controllerAndDto" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      ADMIN_INVITATION_CODE: ${{ secrets.ADMIN_INVITATION_CODE }}
+      INITIAL_ADMIN_PASSWORD: ${{ secrets.INITIAL_ADMIN_PASSWORD }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+    - name: Give permission to Maven wrapper
+      run: chmod +x mvnw
+
+    - name: Build Spring Boot application
+      run: ./mvnw clean package -DskipTests
