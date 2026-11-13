@@ -1,6 +1,10 @@
-// Examination list and details handling
+// Examination list, details, and registration warning handling
+
+let currentPendingExamId = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
+    ensureWarningModal();
+
     // Check if on details page or list page
     const detailsContainer = document.getElementById("exam-details-container");
     if (detailsContainer) {
@@ -28,6 +32,10 @@ async function loadExamList() {
             grid.innerHTML = exams.map(exam => {
                 const dateVal = exam.examinationDate || exam.examDate || 'TBA';
                 const statusClass = (exam.registrationStatus || 'closed').toLowerCase().replace('_', '-');
+                const safeName = escapeAttr(exam.examName || '');
+                const safeCode = escapeAttr(exam.examCode || '');
+                const safeDate = escapeAttr(dateVal);
+
                 return `
                 <div class="exam-card">
                     <div class="exam-card-header">
@@ -48,7 +56,7 @@ async function loadExamList() {
                     <div class="exam-card-footer">
                         <a href="/exam-details.html?id=${exam.id}" class="btn btn-secondary btn-sm">View Details</a>
                         ${exam.canRegister
-                            ? `<button onclick="registerForExam('${exam.id}')" class="btn btn-primary btn-sm">Register</button>`
+                            ? `<button onclick="promptRegistrationWarning('${exam.id}', '${safeName}', '${safeCode}', '${safeDate}')" class="btn btn-primary btn-sm">Register</button>`
                             : `<button class="btn btn-secondary btn-sm" disabled title="Registration ${exam.registrationStatus.toLowerCase()}">Closed</button>`
                         }
                     </div>
@@ -82,6 +90,9 @@ async function loadExamDetails() {
 
         const exam = data.data;
         const dateVal = exam.examinationDate || exam.examDate || 'TBA';
+        const safeName = escapeAttr(exam.examName || '');
+        const safeCode = escapeAttr(exam.examCode || '');
+        const safeDate = escapeAttr(dateVal);
 
         // Check if student profile is complete
         let profileCompleted = true;
@@ -125,18 +136,34 @@ async function loadExamDetails() {
                     </div>
                 </div>
 
-                <div style="margin-bottom: 1.75rem;">
+                <div style="margin-bottom: 1.25rem;">
                     <label style="font-size: 0.875rem; font-weight: 600; color: #374151;">Description</label>
                     <p style="font-size: 0.95rem; color: #4b5563; margin-top: 0.35rem; line-height: 1.6;">
                         ${escapeHtml(exam.description || 'No detailed instructions provided.')}
                     </p>
                 </div>
 
-                <div style="display: flex; gap: 12px; align-items: center;">
+                <!-- Registration Warning Box -->
+                <div class="warning-box">
+                    <div class="warning-box-header">
+                        <span>⚠️</span> Important Examination Registration Warning & Advisory
+                    </div>
+                    <div class="warning-box-body">
+                        Please review your candidate details thoroughly before registering:
+                        <ul class="warning-box-list">
+                            <li><strong>Permanent Record:</strong> Your full name, date of birth, and identification details from your profile will be permanently stamped on your examination admit card and registration certificate.</li>
+                            <li><strong>Strict Single Registration:</strong> You may register only once for this examination cycle. Duplicate registration attempts will be automatically rejected.</li>
+                            <li><strong>Non-Transferable & Final:</strong> Once registered, examination entries cannot be modified, transferred, or retracted.</li>
+                            <li><strong>Capacity & Deadline:</strong> Registration closes automatically on <strong>${exam.registrationEndDate}</strong> or when maximum candidate capacity is reached.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; align-items: center; margin-top: 1.5rem;">
                     <a href="/exams.html" class="btn btn-secondary">Back to Examinations</a>
                     ${exam.canRegister
                         ? (profileCompleted
-                            ? `<button id="btn-register-action" onclick="registerForExam('${exam.id}')" class="btn btn-primary">Register for Exam</button>`
+                            ? `<button id="btn-register-action" onclick="promptRegistrationWarning('${exam.id}', '${safeName}', '${safeCode}', '${safeDate}')" class="btn btn-primary">Register for Exam</button>`
                             : `<a href="/profile.html?status=incomplete" class="btn btn-warning" style="background:#f59e0b; color:white;">Complete Profile to Register</a>`
                           )
                         : `<button class="btn btn-secondary" disabled>Registration Unavailable (${exam.registrationStatus})</button>`
@@ -146,12 +173,116 @@ async function loadExamDetails() {
         `;
 
         if (urlParams.get("action") === "register" && exam.canRegister && profileCompleted) {
-            registerForExam(exam.id);
+            promptRegistrationWarning(exam.id, exam.examName, exam.examCode, dateVal);
         }
 
     } catch (err) {
         console.error("Error loading exam details:", err);
     }
+}
+
+// Create and insert modal into DOM if not present
+function ensureWarningModal() {
+    if (document.getElementById("registration-warning-modal")) return;
+
+    const modalHtml = `
+        <div id="registration-warning-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-warning-title">
+            <div class="modal-dialog">
+                <div class="modal-header">
+                    <h3 id="modal-warning-title"><span>⚠️</span> Confirm Examination Registration</h3>
+                    <button type="button" class="modal-close-btn" onclick="closeRegistrationWarningModal()" aria-label="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-exam-summary">
+                        <p><strong>Examination:</strong> <span id="modal-exam-name"></span></p>
+                        <p><strong>Code:</strong> <span id="modal-exam-code"></span> &nbsp;|&nbsp; <strong>Date:</strong> <span id="modal-exam-date"></span></p>
+                    </div>
+
+                    <div class="warning-box" style="margin: 0;">
+                        <div class="warning-box-header" style="font-size: 0.95rem;">
+                            <span>⚠️</span> Candidate Declaration & Advisory
+                        </div>
+                        <div class="warning-box-body" style="font-size: 0.85rem;">
+                            <ul class="warning-box-list" style="margin-left: 1rem;">
+                                <li>I confirm that my personal and academic profile details are accurate and verified.</li>
+                                <li>I understand that this registration is final and cannot be modified or re-submitted.</li>
+                                <li>I acknowledge that duplicate registration attempts will be automatically rejected.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <label class="warning-declaration-label">
+                        <input type="checkbox" id="warning-ack-checkbox" onchange="toggleConfirmButton(this.checked)">
+                        <span>I have read and agree to all examination instructions, and confirm that all submitted profile details are accurate.</span>
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeRegistrationWarningModal()">Cancel</button>
+                    <button type="button" id="btn-modal-confirm-register" class="btn btn-primary" disabled onclick="executeConfirmedRegistration()">Confirm & Register</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", modalHtml);
+
+    // Close on backdrop click
+    const modal = document.getElementById("registration-warning-modal");
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeRegistrationWarningModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("active")) {
+            closeRegistrationWarningModal();
+        }
+    });
+}
+
+// Display warning modal
+function promptRegistrationWarning(examId, examName, examCode, examDate) {
+    ensureWarningModal();
+    currentPendingExamId = examId;
+
+    document.getElementById("modal-exam-name").textContent = examName || "Selected Examination";
+    document.getElementById("modal-exam-code").textContent = examCode || "N/A";
+    document.getElementById("modal-exam-date").textContent = examDate || "TBA";
+
+    // Reset checkbox and confirm button
+    const checkbox = document.getElementById("warning-ack-checkbox");
+    checkbox.checked = false;
+    const confirmBtn = document.getElementById("btn-modal-confirm-register");
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Confirm & Register";
+
+    const modal = document.getElementById("registration-warning-modal");
+    modal.classList.add("active");
+}
+
+function closeRegistrationWarningModal() {
+    const modal = document.getElementById("registration-warning-modal");
+    if (modal) modal.classList.remove("active");
+    currentPendingExamId = null;
+}
+
+function toggleConfirmButton(isChecked) {
+    const btn = document.getElementById("btn-modal-confirm-register");
+    if (btn) btn.disabled = !isChecked;
+}
+
+async function executeConfirmedRegistration() {
+    if (!currentPendingExamId) return;
+
+    const btn = document.getElementById("btn-modal-confirm-register");
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Registering...";
+    }
+
+    const examId = currentPendingExamId;
+    closeRegistrationWarningModal();
+    await registerForExam(examId);
 }
 
 async function registerForExam(examId) {
@@ -191,4 +322,9 @@ function escapeHtml(str) {
         "'": '&#39;',
         '"': '&quot;'
     }[tag] || tag));
+}
+
+function escapeAttr(str) {
+    if (!str) return "";
+    return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
